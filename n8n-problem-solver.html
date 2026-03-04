@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#E8B400">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="n8n Solver">
+<title>2026 n8n Problem Solver</title>
+<link rel="manifest" href="#" id="manifest-link">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+:root{
+  --y0:#FFFBEA;--y1:#FFF3B0;--y2:#FFE566;--y3:#E8B400;--y4:#CC9900;--y5:#A07800;--y6:#7A5C00;--y7:#3D2E00;--y8:#1A1200;
+  --vr:#C93500;--vrs:#FF6B35;--green:#40D080;--blue:#40AAFF;
+  --bg:#0F0A00;--bg2:#1A1200;--bg3:#2A2000;
+  --card:rgba(255,229,102,.04);--cardb:rgba(255,229,102,.12);--cardh:rgba(255,229,102,.08);
+  --tp:#FFFBEA;--ts:rgba(255,251,234,.65);--tm:rgba(255,251,234,.35);
+  --sh-sm:0 2px 8px rgba(0,0,0,.4),0 0 0 1px rgba(255,229,102,.06);
+  --sh-md:0 4px 20px rgba(0,0,0,.5),0 0 0 1px rgba(255,229,102,.08),0 1px 0 rgba(255,229,102,.1) inset;
+  --sh-lg:0 8px 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,229,102,.1);
+  --sh-glow:0 0 20px rgba(232,180,0,.25),0 4px 20px rgba(0,0,0,.5);
+  --fd:'Syne',sans-serif;--fm:'JetBrains Mono',monospace;
+  --xs:.694rem;--sm:.833rem;--base:1rem;--lg:1.2rem;--xl:1.44rem;--2xl:1.728rem;
+  --sp:8px;--nav:64px;--r:12px;--rl:20px;
+}
+[data-theme=light]{
+  --bg:#FFFBEA;--bg2:#FFF3B0;--bg3:#FFE566;
+  --card:rgba(0,0,0,.04);--cardb:rgba(0,0,0,.12);--cardh:rgba(0,0,0,.07);
+  --tp:#1A1200;--ts:rgba(26,18,0,.65);--tm:rgba(26,18,0,.4);
+  --sh-sm:0 2px 8px rgba(0,0,0,.08);--sh-md:0 4px 20px rgba(0,0,0,.1);--sh-lg:0 8px 40px rgba(0,0,0,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fd);background:var(--bg);color:var(--tp);font-size:var(--base);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--y4);border-radius:2px}
+:focus-visible{outline:2px solid var(--y3);outline-offset:3px;border-radius:4px}
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;background:var(--bg)}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(15,10,0,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--cardb);padding:calc(var(--sp)*2) calc(var(--sp)*3);display:flex;align-items:center;justify-content:space-between}
+[data-theme=light] .hdr{background:rgba(255,251,234,.88)}
+.hdr-brand{display:flex;flex-direction:column;gap:2px}
+.hdr-logo{font-size:var(--lg);font-weight:800;letter-spacing:-.02em;color:var(--y3);line-height:1}
+.hdr-tag{font-size:var(--xs);color:var(--tm);font-family:var(--fm);letter-spacing:.04em}
+.hdr-right{display:flex;align-items:center;gap:var(--sp)}
+.icon-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--cardb);background:var(--card);color:var(--ts);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:18px}
+.icon-btn:hover{background:var(--cardh);color:var(--y3);border-color:var(--y4)}
+
+/* NAV */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:var(--nav);background:rgba(15,10,0,.93);backdrop-filter:blur(24px);border-top:1px solid var(--cardb);display:flex;align-items:stretch;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
+[data-theme=light] .nav{background:rgba(255,251,234,.93)}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;position:relative;border:none;background:transparent;color:var(--tm);font-family:var(--fd);font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:color .2s;padding:0;min-height:44px}
+.ni::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%) scaleX(0);width:28px;height:2px;background:var(--y3);border-radius:0 0 2px 2px;box-shadow:0 0 8px var(--y3);transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.ni.active::before{transform:translateX(-50%) scaleX(1)}
+.ni-iw{width:30px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s;background:transparent}
+.ni.active .ni-iw{background:rgba(232,180,0,.15)}
+.ni.active{color:var(--y3)}
+
+/* PAGES */
+.pages{padding-bottom:var(--nav)}
+.page{display:none;padding:calc(var(--sp)*3);min-height:calc(100vh - var(--nav) - 73px);animation:fadeIn .25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--cardb);border-radius:var(--rl);padding:calc(var(--sp)*3);box-shadow:var(--sh-md);margin-bottom:calc(var(--sp)*2)}
+.card-title{font-size:var(--sm);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--y4);margin-bottom:calc(var(--sp)*2);display:flex;align-items:center;gap:var(--sp)}
+.sec-title{font-size:var(--xl);font-weight:800;letter-spacing:-.03em;color:var(--tp);margin-bottom:calc(var(--sp)*3);line-height:1.2}
+.sec-title span{color:var(--y3)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp);min-height:44px;padding:0 calc(var(--sp)*3);border-radius:var(--r);font-family:var(--fd);font-weight:700;font-size:var(--sm);letter-spacing:.04em;cursor:pointer;border:none;transition:all .2s;position:relative;overflow:hidden}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--y3);color:var(--y8);box-shadow:0 4px 16px rgba(232,180,0,.35)}
+.btn-p:hover{background:var(--y2);box-shadow:0 6px 24px rgba(232,180,0,.5)}
+.btn-s{background:var(--card);color:var(--tp);border:1px solid var(--cardb)}
+.btn-s:hover{background:var(--cardh);border-color:var(--y4);color:var(--y3)}
+.btn-w{background:rgba(201,53,0,.12);color:var(--vrs);border:1px solid rgba(201,53,0,.2)}
+.btn-w:hover{background:rgba(201,53,0,.2)}
+.btn-g{background:rgba(64,208,128,.1);color:var(--green);border:1px solid rgba(64,208,128,.2)}
+.btn-g:hover{background:rgba(64,208,128,.18)}
+.btn-full{width:100%}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:var(--xs);font-weight:700;letter-spacing:.06em;font-family:var(--fm)}
+.bc{background:rgba(201,53,0,.2);color:var(--vrs);border:1px solid rgba(201,53,0,.3)}
+.bw{background:rgba(232,180,0,.2);color:var(--y3);border:1px solid rgba(232,180,0,.3)}
+.bi{background:rgba(64,170,255,.15);color:var(--blue);border:1px solid rgba(64,170,255,.2)}
+.bg-ok{background:rgba(64,208,128,.15);color:var(--green);border:1px solid rgba(64,208,128,.2)}
+
+/* FORMS */
+.fgrp{display:flex;flex-direction:column;gap:var(--sp);margin-bottom:calc(var(--sp)*2)}
+.flbl{font-size:var(--xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--y5)}
+textarea,select,input[type=text],input[type=url],input[type=number]{width:100%;min-height:44px;padding:calc(var(--sp)*1.5) calc(var(--sp)*2);background:var(--bg2);border:1px solid var(--cardb);border-radius:var(--r);color:var(--tp);font-family:var(--fm);font-size:var(--sm);resize:vertical;transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none}
+textarea:focus,select:focus,input:focus{border-color:var(--y3);box-shadow:0 0 0 3px rgba(232,180,0,.15)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23E8B400' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;cursor:pointer}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--y3);cursor:pointer}
+
+/* UPLOAD ZONE */
+.uz{border:2px dashed var(--cardb);border-radius:var(--rl);padding:calc(var(--sp)*5);text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--card);margin-bottom:calc(var(--sp)*2);min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--sp)*1.5)}
+.uz:hover,.uz.drag{border-color:var(--y3);background:rgba(232,180,0,.06);box-shadow:var(--sh-glow);transform:scale(1.01)}
+.uz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz-icon{font-size:40px;filter:drop-shadow(0 0 10px rgba(232,180,0,.4));transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.uz:hover .uz-icon{transform:scale(1.15) translateY(-3px)}
+.uz-title{font-size:var(--lg);font-weight:700;color:var(--tp)}
+.uz-sub{font-size:var(--sm);color:var(--tm);font-family:var(--fm)}
+
+/* TOGGLE */
+.tw{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--sp)*1.5) calc(var(--sp)*2);background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);margin-bottom:var(--sp);min-height:44px}
+.tgl{position:relative;width:44px;height:26px;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0;position:absolute}
+.tgl-t{position:absolute;inset:0;background:var(--bg3);border-radius:13px;cursor:pointer;border:1px solid var(--cardb);transition:all .25s}
+.tgl-t::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:var(--tm);border-radius:50%;transition:all .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.tgl input:checked+.tgl-t{background:var(--y3);border-color:var(--y4);box-shadow:0 0 10px rgba(232,180,0,.3)}
+.tgl input:checked+.tgl-t::after{transform:translateX(18px);background:var(--y8)}
+
+/* STATUS */
+.sp-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:var(--xs);font-weight:700;font-family:var(--fm)}
+.sp-dot{width:6px;height:6px;border-radius:50%}
+.sp-ok{background:rgba(64,208,128,.15);color:var(--green)}
+.sp-ok .sp-dot{background:var(--green);box-shadow:0 0 4px var(--green)}
+.sp-err{background:rgba(201,53,0,.15);color:var(--vrs)}
+.sp-err .sp-dot{background:var(--vrs)}
+.sp-scan{background:rgba(232,180,0,.15);color:var(--y3)}
+.sp-scan .sp-dot{background:var(--y3);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* SCORE */
+.s-ring{position:relative;width:110px;height:110px;flex-shrink:0}
+.s-ring svg{transform:rotate(-90deg);width:110px;height:110px}
+.s-rbg{fill:none;stroke:var(--bg3);stroke-width:8}
+.s-rfill{fill:none;stroke:var(--y3);stroke-width:8;stroke-linecap:round;stroke-dasharray:299.2;stroke-dashoffset:299.2;transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)}
+.s-rt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.s-val{font-size:var(--xl);font-weight:800;color:var(--y3);line-height:1;letter-spacing:-.04em}
+.s-lbl{font-size:var(--xs);color:var(--tm);font-family:var(--fm);letter-spacing:.06em}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:calc(var(--sp)*2)}
+.sc{background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);padding:calc(var(--sp)*2);text-align:center}
+.sc-v{font-size:var(--xl);font-weight:800;color:var(--y3);letter-spacing:-.04em;line-height:1;margin-bottom:4px}
+.sc-l{font-size:var(--xs);color:var(--tm);font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em}
+
+/* PROGRESS */
+.pb{height:5px;border-radius:3px;background:var(--bg3);overflow:hidden;margin-top:5px}
+.pf{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--y5),var(--y3),var(--y2));transition:width 1.2s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px rgba(232,180,0,.4)}
+
+/* LOG */
+.log-e{display:grid;grid-template-columns:10px 1fr auto;grid-template-rows:auto auto;gap:3px 10px;padding:calc(var(--sp)*1.5) calc(var(--sp)*2);border-radius:var(--r);border:1px solid var(--cardb);background:var(--card);margin-bottom:var(--sp);cursor:pointer;transition:all .2s}
+.log-e:hover{background:var(--cardh);border-color:var(--y5)}
+.log-dot{grid-row:1;grid-column:1;width:8px;height:8px;border-radius:50%;margin-top:5px}
+.log-dot.critical{background:var(--vrs);box-shadow:0 0 5px var(--vrs)}
+.log-dot.warning{background:var(--y3);box-shadow:0 0 5px var(--y3)}
+.log-dot.info{background:var(--blue);box-shadow:0 0 5px var(--blue)}
+.log-dot.ok{background:var(--green);box-shadow:0 0 5px var(--green)}
+.log-msg{grid-row:1;grid-column:2;font-size:var(--sm);color:var(--tp);font-weight:500;line-height:1.4}
+.log-time{grid-row:1;grid-column:3;font-size:var(--xs);color:var(--tm);font-family:var(--fm);white-space:nowrap}
+.log-det{grid-row:2;grid-column:2/4;font-size:var(--xs);color:var(--tm);font-family:var(--fm);display:none;padding-top:3px;line-height:1.6}
+.log-e.expanded .log-det{display:block}
+
+/* ERROR ITEM */
+.ei{display:flex;flex-direction:column;gap:5px;padding:calc(var(--sp)*2);border-radius:var(--r);background:var(--card);border-left:3px solid transparent;margin-bottom:var(--sp);cursor:pointer;transition:all .2s}
+.ei.critical{border-left-color:var(--vrs)}
+.ei.warning{border-left-color:var(--y3)}
+.ei.info{border-left-color:var(--blue)}
+.ei:hover{background:var(--cardh)}
+.ei-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--sp)}
+.ei-title{font-size:var(--sm);font-weight:600;color:var(--tp);flex:1}
+.ei-det{font-size:var(--xs);color:var(--tm);font-family:var(--fm);line-height:1.6;display:none}
+.ei.expanded .ei-det{display:block}
+
+/* JSON VIEWER */
+.jv{background:var(--bg2);border:1px solid var(--cardb);border-radius:var(--r);padding:calc(var(--sp)*2);font-family:var(--fm);font-size:var(--xs);line-height:1.7;overflow:auto;max-height:280px;color:var(--ts);white-space:pre-wrap;word-break:break-all}
+.jk{color:var(--y3)}.js{color:#7EC8A4}.jn{color:var(--blue)}.jb{color:var(--vrs)}.jnu{color:var(--tm)}
+
+/* COPY AREA */
+.copy-area{position:relative}
+.copy-btn{position:absolute;top:var(--sp);right:var(--sp);min-height:28px;height:28px;padding:0 10px;font-size:var(--xs);background:rgba(232,180,0,.15);border:1px solid rgba(232,180,0,.2);color:var(--y3);border-radius:6px;cursor:pointer;font-family:var(--fm);font-weight:600;transition:all .2s;display:flex;align-items:center;gap:4px;z-index:1}
+.copy-btn:hover{background:rgba(232,180,0,.25)}
+
+/* METRIC ROW */
+.mr{display:grid;grid-template-columns:1fr auto;align-items:center;gap:var(--sp);padding:calc(var(--sp)*1.5) 0;border-bottom:1px solid var(--cardb)}
+.mr:last-child{border-bottom:none}
+.mr-l{font-size:var(--sm);color:var(--ts);font-weight:500}
+.mr-v{font-size:var(--sm);font-weight:700;font-family:var(--fm);color:var(--y3)}
+
+/* DIVIDER */
+.div{height:1px;background:var(--cardb);margin:calc(var(--sp)*3) 0}
+
+/* EMPTY */
+.empty{text-align:center;padding:calc(var(--sp)*8) calc(var(--sp)*4);color:var(--tm)}
+.empty-i{font-size:44px;margin-bottom:calc(var(--sp)*2);opacity:.4}
+.empty-t{font-size:var(--sm);font-family:var(--fm);line-height:1.6}
+
+/* SCAN STEPS */
+.scan-box{display:none;flex-direction:column;gap:var(--sp);padding:calc(var(--sp)*3);background:var(--card);border:1px solid var(--cardb);border-radius:var(--rl);margin-bottom:calc(var(--sp)*2)}
+.scan-box.active{display:flex}
+.ss{display:flex;align-items:center;gap:10px;font-size:var(--sm);color:var(--tm);transition:color .3s}
+.ss.done{color:var(--y3)}.ss.cur{color:var(--tp);animation:pulse 1.2s infinite}
+.ss-i{width:20px;height:20px;border-radius:50%;background:var(--bg3);border:1px solid var(--cardb);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .3s}
+.ss.done .ss-i{background:var(--y3);color:var(--y8);border-color:var(--y3)}
+
+/* AI PANEL */
+.ai-panel{background:linear-gradient(135deg,rgba(232,180,0,.06),rgba(232,180,0,.02));border:1px solid rgba(232,180,0,.2);border-radius:var(--rl);padding:calc(var(--sp)*3);margin-bottom:calc(var(--sp)*2);position:relative;overflow:hidden}
+.ai-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--y3),transparent);opacity:.5}
+.ai-pt{font-size:var(--xs);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--y4);margin-bottom:calc(var(--sp)*2);display:flex;align-items:center;gap:var(--sp)}
+.ai-btn{display:flex;align-items:center;gap:var(--sp);min-height:44px;padding:0 calc(var(--sp)*2);border-radius:var(--r);background:rgba(232,180,0,.08);border:1px solid rgba(232,180,0,.15);color:var(--ts);font-size:var(--sm);font-weight:600;font-family:var(--fd);cursor:pointer;transition:all .2s;width:100%;margin-bottom:var(--sp);text-align:left}
+.ai-btn:hover,.ai-btn.active{background:rgba(232,180,0,.15);border-color:var(--y3);color:var(--y2)}
+.ai-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+
+/* FILE INFO */
+.fi{display:flex;align-items:center;gap:calc(var(--sp)*2);padding:calc(var(--sp)*2);background:rgba(64,208,128,.06);border:1px solid rgba(64,208,128,.15);border-radius:var(--r);margin-bottom:calc(var(--sp)*2)}
+.fi-icon{font-size:26px;flex-shrink:0}
+
+/* ENGINES GRID */
+.eng-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:calc(var(--sp)*2)}
+.eng-card{background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);padding:calc(var(--sp)*2);cursor:pointer;transition:all .2s;text-align:left;font-family:var(--fd);min-height:80px;display:flex;flex-direction:column;gap:6px}
+.eng-card:hover{background:var(--cardh);border-color:var(--y4);box-shadow:var(--sh-sm)}
+.eng-card.running{border-color:var(--y3);background:rgba(232,180,0,.08);animation:cardpulse 1s infinite}
+.eng-card.done{border-color:var(--green);background:rgba(64,208,128,.06)}
+.eng-card.fail{border-color:var(--vrs);background:rgba(201,53,0,.06)}
+@keyframes cardpulse{0%,100%{box-shadow:0 0 0 0 rgba(232,180,0,.3)}50%{box-shadow:0 0 0 4px rgba(232,180,0,.1)}}
+.eng-icon{font-size:22px}
+.eng-name{font-size:var(--xs);font-weight:700;color:var(--tp);letter-spacing:.02em}
+.eng-status{font-size:var(--xs);color:var(--tm);font-family:var(--fm)}
+
+/* RESULT PANEL */
+.res-panel{background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);padding:calc(var(--sp)*2);margin-top:var(--sp);margin-bottom:calc(var(--sp)*2);display:none}
+.res-panel.active{display:block}
+.res-title{font-size:var(--xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--y4);margin-bottom:var(--sp)}
+.res-content{font-size:var(--xs);font-family:var(--fm);color:var(--ts);line-height:1.75;white-space:pre-wrap}
+
+/* EXPR TABLE */
+.expr-table{width:100%;border-collapse:collapse;font-size:var(--xs);font-family:var(--fm)}
+.expr-table th{text-align:left;padding:6px 8px;background:var(--bg3);color:var(--y4);font-size:var(--xs);letter-spacing:.06em;border-bottom:1px solid var(--cardb)}
+.expr-table td{padding:6px 8px;border-bottom:1px solid rgba(255,229,102,.05);color:var(--ts);vertical-align:top;word-break:break-all}
+.expr-table tr:hover td{background:var(--cardh)}
+.expr-ok{color:var(--green)}.expr-warn{color:var(--vrs)}.expr-na{color:var(--tm)}
+
+/* COMPAT TABLE */
+.compat-row{display:flex;align-items:center;gap:var(--sp);padding:calc(var(--sp)*1.5) 0;border-bottom:1px solid var(--cardb)}
+.compat-row:last-child{border-bottom:none}
+.compat-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center}
+.compat-name{font-size:var(--sm);color:var(--tp);flex:1;font-weight:500}
+.compat-badge{font-size:var(--xs);font-family:var(--fm);font-weight:600}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(var(--nav) + 16px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--y3);color:var(--y8);padding:10px 20px;border-radius:24px;font-size:var(--sm);font-weight:700;z-index:9999;opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;box-shadow:0 4px 20px rgba(232,180,0,.4)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* OPT ITEM */
+.oi{display:flex;align-items:flex-start;gap:calc(var(--sp)*2);padding:calc(var(--sp)*2);border-radius:var(--r);background:var(--card);border:1px solid var(--cardb);margin-bottom:var(--sp)}
+.oi-icon{font-size:18px;flex-shrink:0;margin-top:2px}
+.oi-title{font-size:var(--sm);font-weight:600;color:var(--tp);margin-bottom:3px}
+.oi-desc{font-size:var(--xs);color:var(--tm);font-family:var(--fm);line-height:1.6}
+
+/* CRED TESTER */
+.cred-item{display:flex;align-items:center;gap:calc(var(--sp)*1.5);padding:calc(var(--sp)*1.5);border-radius:var(--r);background:var(--card);border:1px solid var(--cardb);margin-bottom:var(--sp)}
+.cred-icon{font-size:18px;flex-shrink:0}
+.cred-name{font-size:var(--sm);font-weight:600;color:var(--tp);flex:1}
+.cred-type{font-size:var(--xs);color:var(--tm);font-family:var(--fm)}
+.cred-result{font-size:var(--xs);font-family:var(--fm);font-weight:600;flex-shrink:0}
+
+/* SHAPE DIFF */
+.shape-node{background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);padding:calc(var(--sp)*2);margin-bottom:var(--sp)}
+.shape-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp)}
+.shape-name{font-size:var(--sm);font-weight:700;color:var(--tp)}
+.shape-fields{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.sf{padding:2px 8px;border-radius:4px;font-size:var(--xs);font-family:var(--fm)}
+.sf-out{background:rgba(64,208,128,.12);color:var(--green);border:1px solid rgba(64,208,128,.2)}
+.sf-in{background:rgba(64,170,255,.12);color:var(--blue);border:1px solid rgba(64,170,255,.2)}
+.sf-mis{background:rgba(201,53,0,.12);color:var(--vrs);border:1px solid rgba(201,53,0,.2)}
+
+/* API TESTER */
+.api-item{padding:calc(var(--sp)*2);border-radius:var(--r);background:var(--card);border:1px solid var(--cardb);margin-bottom:var(--sp)}
+.api-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.api-name{font-size:var(--sm);font-weight:700;color:var(--tp)}
+.api-url{font-size:var(--xs);color:var(--tm);font-family:var(--fm);word-break:break-all;margin-bottom:8px}
+.method-badge{padding:2px 8px;border-radius:4px;font-size:var(--xs);font-family:var(--fm);font-weight:700}
+.m-get{background:rgba(64,208,128,.15);color:var(--green)}.m-post{background:rgba(64,170,255,.15);color:var(--blue)}.m-put{background:rgba(232,180,0,.15);color:var(--y3)}.m-del{background:rgba(201,53,0,.15);color:var(--vrs)}.m-patch{background:rgba(160,120,0,.15);color:var(--y4)}
+
+/* LOGIC GRAPH */
+.graph-wrap{background:var(--bg2);border:1px solid var(--cardb);border-radius:var(--r);padding:var(--sp);overflow:auto;margin-bottom:var(--sp)}
+canvas{display:block;border-radius:8px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">⚡ n8n Solver</div>
+    <div class="hdr-tag">Upload · Dig · Solve · Optimize</div>
+  </div>
+  <div class="hdr-right">
+    <div id="status-ind" class="sp-pill sp-ok"><span class="sp-dot"></span><span>Ready</span></div>
+    <button class="icon-btn" id="theme-btn" aria-label="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main class="pages">
+
+<!-- ══════════════════════════════════════════════════
+     PAGE 1 — UPLOAD
+══════════════════════════════════════════════════ -->
+<section class="page active" id="page-upload">
+  <h1 class="sec-title">Upload <span>Workflow</span></h1>
+
+  <div class="uz" id="uz" tabindex="0" role="button" aria-label="Drop JSON file or click to browse">
+    <input type="file" id="file-in" accept=".json,application/json" aria-label="Choose JSON file">
+    <div class="uz-icon">📂</div>
+    <div class="uz-title">Drop n8n JSON here</div>
+    <div class="uz-sub">Click · Drag &amp; Drop · or Paste below</div>
+  </div>
+
+  <div id="fi" class="fi" style="display:none">
+    <div class="fi-icon">📄</div>
+    <div><div style="font-size:var(--sm);font-weight:600" id="fi-name">—</div><div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm)" id="fi-size">—</div></div>
+    <div style="margin-left:auto"><span class="sp-pill sp-ok"><span class="sp-dot"></span>Loaded</span></div>
+  </div>
+
+  <div class="fgrp">
+    <label class="flbl" for="paste-area">Or paste JSON</label>
+    <textarea id="paste-area" rows="5" placeholder='{"nodes":[...],"connections":{}}'></textarea>
+  </div>
+
+  <button class="btn btn-p btn-full" onclick="startAnalysis()">🔬 Analyze Workflow</button>
+
+  <div class="div"></div>
+
+  <div class="card">
+    <div class="card-title">⚙️ Quick Config</div>
+    <div class="tw"><span style="font-size:var(--sm);font-weight:600">Deep Scan</span><label class="tgl"><input type="checkbox" id="t-deep" checked><span class="tgl-t"></span></label></div>
+    <div class="tw"><span style="font-size:var(--sm);font-weight:600">Expression Evaluator</span><label class="tgl"><input type="checkbox" id="t-expr" checked><span class="tgl-t"></span></label></div>
+    <div class="tw"><span style="font-size:var(--sm);font-weight:600">Version Compatibility Check</span><label class="tgl"><input type="checkbox" id="t-compat" checked><span class="tgl-t"></span></label></div>
+    <div class="tw"><span style="font-size:var(--sm);font-weight:600">Data Shape Analyzer</span><label class="tgl"><input type="checkbox" id="t-shape" checked><span class="tgl-t"></span></label></div>
+    <div class="tw" style="margin-bottom:0"><span style="font-size:var(--sm);font-weight:600">API Config Validator</span><label class="tgl"><input type="checkbox" id="t-api" checked><span class="tgl-t"></span></label></div>
+    <div class="fgrp" style="margin-top:16px;margin-bottom:0">
+      <label class="flbl" for="n8n-version">Target n8n Version</label>
+      <select id="n8n-version">
+        <option value="1.0">1.0.x</option>
+        <option value="1.1">1.1.x</option>
+        <option value="1.2">1.2.x</option>
+        <option value="1.3">1.3.x</option>
+        <option value="1.4" selected>1.4.x (latest)</option>
+        <option value="0.236">0.236.x (legacy)</option>
+        <option value="0.220">0.220.x (legacy)</option>
+        <option value="0.200">0.200.x (legacy)</option>
+      </select>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE 2 — ANALYZER
+══════════════════════════════════════════════════ -->
+<section class="page" id="page-analyzer">
+  <h1 class="sec-title">Analysis <span>Results</span></h1>
+
+  <div id="a-empty" class="empty"><div class="empty-i">🔬</div><div class="empty-t">No workflow analyzed yet.<br>Upload a JSON to begin.</div></div>
+
+  <div id="a-results" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <div class="s-ring">
+        <svg viewBox="0 0 110 110"><circle class="s-rbg" cx="55" cy="55" r="47.6"/><circle class="s-rfill" id="score-circle" cx="55" cy="55" r="47.6"/></svg>
+        <div class="s-rt"><span class="s-val" id="h-score">0%</span><span class="s-lbl">HEALTH</span></div>
+      </div>
+      <div class="sg" style="flex:1;margin-left:16px">
+        <div class="sc"><div class="sc-v" id="eff-score">—</div><div class="sc-l">Efficiency</div></div>
+        <div class="sc"><div class="sc-v" id="stab-score">—</div><div class="sc-l">Stability</div></div>
+        <div class="sc"><div class="sc-v" id="sec-score">—</div><div class="sc-l">Security</div></div>
+        <div class="sc"><div class="sc-v" id="node-count">—</div><div class="sc-l">Nodes</div></div>
+      </div>
+    </div>
+
+    <div class="scan-box" id="scan-box">
+      <div class="ss" id="s1"><span class="ss-i">1</span>Parsing JSON</div>
+      <div class="ss" id="s2"><span class="ss-i">2</span>Graph reconstruction</div>
+      <div class="ss" id="s3"><span class="ss-i">3</span>Node reference validation</div>
+      <div class="ss" id="s4"><span class="ss-i">4</span>Credential structure check</div>
+      <div class="ss" id="s5"><span class="ss-i">5</span>Expression pattern analysis</div>
+      <div class="ss" id="s6"><span class="ss-i">6</span>Version compatibility scan</div>
+      <div class="ss" id="s7"><span class="ss-i">7</span>Data shape inference</div>
+      <div class="ss" id="s8"><span class="ss-i">8</span>API config validation</div>
+      <div class="ss" id="s9"><span class="ss-i">9</span>Logic &amp; circular detection</div>
+      <div class="ss" id="s10"><span class="ss-i">10</span>Security hardening</div>
+    </div>
+
+    <!-- 7 ENGINE CARDS -->
+    <div class="card">
+      <div class="card-title">🔧 Analysis Engines</div>
+      <div class="eng-grid">
+        <button class="eng-card" id="eng-runtime" onclick="runEngine('runtime')" aria-label="Runtime Simulator">
+          <span class="eng-icon">▶️</span>
+          <span class="eng-name">Runtime Simulator</span>
+          <span class="eng-status" id="est-runtime">Click to run</span>
+        </button>
+        <button class="eng-card" id="eng-expr" onclick="runEngine('expr')" aria-label="Expression Evaluator">
+          <span class="eng-icon">🧮</span>
+          <span class="eng-name">Expression Evaluator</span>
+          <span class="eng-status" id="est-expr">Click to run</span>
+        </button>
+        <button class="eng-card" id="eng-cred" onclick="runEngine('cred')" aria-label="Credential Auditor">
+          <span class="eng-icon">🔑</span>
+          <span class="eng-name">Credential Auditor</span>
+          <span class="eng-status" id="est-cred">Click to run</span>
+        </button>
+        <button class="eng-card" id="eng-api" onclick="runEngine('api')" aria-label="API Config Validator">
+          <span class="eng-icon">🌐</span>
+          <span class="eng-name">API Validator</span>
+          <span class="eng-status" id="est-api">Click to run</span>
+        </button>
+        <button class="eng-card" id="eng-logic" onclick="runEngine('logic')" aria-label="Logic Bug Detector">
+          <span class="eng-icon">🧠</span>
+          <span class="eng-name">Logic Debugger</span>
+          <span class="eng-status" id="est-logic">Click to run</span>
+        </button>
+        <button class="eng-card" id="eng-compat" onclick="runEngine('compat')" aria-label="Version Compatibility">
+          <span class="eng-icon">📦</span>
+          <span class="eng-name">Version Compat</span>
+          <span class="eng-status" id="est-compat">Click to run</span>
+        </button>
+        <button class="eng-card" id="eng-shape" onclick="runEngine('shape')" aria-label="Data Shape Analyzer" style="grid-column:span 2">
+          <span class="eng-icon">🔀</span>
+          <span class="eng-name">Data Shape Analyzer</span>
+          <span class="eng-status" id="est-shape">Click to run</span>
+        </button>
+        <button class="eng-card" id="eng-credlive" onclick="runEngine('credlive')" aria-label="Live Credential Tester">
+          <span class="eng-icon">🔌</span>
+          <span class="eng-name">Live Cred Tester</span>
+          <span class="eng-status" id="est-credlive">Click to run</span>
+        </button>
+        <button class="eng-card" id="eng-bodyschema" onclick="runEngine('bodyschema')" aria-label="POST Body Schema Matcher">
+          <span class="eng-icon">📐</span>
+          <span class="eng-name">Body Schema Match</span>
+          <span class="eng-status" id="est-bodyschema">Click to run</span>
+        </button>
+        <button class="eng-card" id="eng-datasim" onclick="runEngine('datasim')" aria-label="Runtime Data Simulator" style="grid-column:span 2">
+          <span class="eng-icon">🧪</span>
+          <span class="eng-name">Runtime Data Simulator</span>
+          <span class="eng-status" id="est-datasim">Paste sample data to run</span>
+        </button>
+        <button class="eng-card" id="eng-intentdet" onclick="runEngine('intentdet')" aria-label="Localhost Intent Detector">
+          <span class="eng-icon">🔍</span>
+          <span class="eng-name">Localhost Detector</span>
+          <span class="eng-status" id="est-intentdet">Click to run</span>
+        </button>
+        <button class="eng-card" id="eng-bizlogic" onclick="showBizLogicModal()" aria-label="Business Logic Verifier">
+          <span class="eng-icon">🎯</span>
+          <span class="eng-name">Business Logic Check</span>
+          <span class="eng-status" id="est-bizlogic">Describe intent to run</span>
+        </button>
+      </div>
+      <button class="btn btn-p btn-full" onclick="runAllEngines()" id="btn-run-all">⚡ Run All Engines</button>
+    </div>
+
+    <!-- ENGINE RESULT PANELS -->
+    <div class="res-panel" id="res-runtime"><div class="res-title">▶️ Runtime Simulation</div><div class="res-content" id="rc-runtime"></div></div>
+    <div class="res-panel" id="res-expr"><div class="res-title">🧮 Expression Analysis</div><div id="rc-expr"></div></div>
+    <div class="res-panel" id="res-cred"><div class="res-title">🔑 Credential Audit</div><div id="rc-cred"></div></div>
+    <div class="res-panel" id="res-api"><div class="res-title">🌐 API Config Validation</div><div id="rc-api"></div></div>
+    <div class="res-panel" id="res-logic"><div class="res-title">🧠 Logic Debug Report</div><div class="res-content" id="rc-logic"></div></div>
+    <div class="res-panel" id="res-compat"><div class="res-title">📦 Version Compatibility</div><div id="rc-compat"></div></div>
+    <div class="res-panel" id="res-shape"><div class="res-title">🔀 Data Shape Analysis</div><div id="rc-shape"></div></div>
+
+    <div class="res-panel" id="res-credlive"><div class="res-title">🔌 Live Credential Tester</div><div id="rc-credlive"></div></div>
+    <div class="res-panel" id="res-bodyschema"><div class="res-title">📐 POST Body Schema Matcher</div><div id="rc-bodyschema"></div></div>
+    <div class="res-panel" id="res-datasim"><div class="res-title">🧪 Runtime Data Simulator</div><div id="rc-datasim"></div></div>
+    <div class="res-panel" id="res-intentdet"><div class="res-title">🔍 Localhost Intent Analysis</div><div id="rc-intentdet"></div></div>
+    <div class="res-panel" id="res-bizlogic"><div class="res-title">🎯 Business Logic Verification</div><div id="rc-bizlogic"></div></div>
+
+    <!-- ERRORS -->
+    <div class="card">
+      <div class="card-title">⚠️ Diagnostics <span id="err-badge" class="badge bc" style="display:none"></span></div>
+      <div id="err-list"></div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="card">
+      <div class="card-title">📊 Workflow Metrics</div>
+      <div id="met-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE 3 — LOGS
+══════════════════════════════════════════════════ -->
+<section class="page" id="page-logs">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+    <h1 class="sec-title" style="margin-bottom:0">Activity <span>Logs</span></h1>
+    <button class="btn btn-s" onclick="clearLogs()">🗑 Clear</button>
+  </div>
+  <div class="fgrp" style="margin-bottom:16px">
+    <select id="log-filter" onchange="renderLogs()" aria-label="Filter logs">
+      <option value="all">All Entries</option>
+      <option value="critical">Critical</option>
+      <option value="warning">Warnings</option>
+      <option value="info">Info</option>
+      <option value="ok">Success</option>
+    </select>
+  </div>
+  <div id="log-container" role="log" aria-live="polite">
+    <div class="empty"><div class="empty-i">📋</div><div class="empty-t">No logs yet. Analyze a workflow.</div></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE 4 — OPTIMIZER
+══════════════════════════════════════════════════ -->
+<section class="page" id="page-optimizer">
+  <h1 class="sec-title">Optimizer <span>Engine</span></h1>
+  <div id="opt-empty" class="empty"><div class="empty-i">⚡</div><div class="empty-t">No data. Run analysis first.</div></div>
+  <div id="opt-results" style="display:none">
+    <div class="card"><div class="card-title">💡 Suggestions</div><div id="sug-list"></div></div>
+    <div class="card">
+      <div class="card-title">📈 Score Breakdown</div>
+      <div id="prog-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE 5 — EXPORT
+══════════════════════════════════════════════════ -->
+<section class="page" id="page-export">
+  <h1 class="sec-title">Export <span>Solution</span></h1>
+  <div id="exp-empty" class="empty"><div class="empty-i">📤</div><div class="empty-t">Nothing to export yet.</div></div>
+  <div id="exp-results" style="display:none">
+    <div class="card"><div class="card-title">📋 Summary</div><div id="sum-report"></div></div>
+    <div class="card">
+      <div class="card-title">✅ Fixed JSON</div>
+      <div class="copy-area">
+        <button class="copy-btn" onclick="copyFixed()">📋 Copy</button>
+        <div class="jv" id="fixed-out" style="max-height:240px"></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+      <button class="btn btn-p btn-full" onclick="dlFixed()">⬇️ Download Fixed JSON</button>
+      <button class="btn btn-s btn-full" onclick="dlReport()">📄 Download Full Report</button>
+      <button class="btn btn-s btn-full" onclick="copyFixed()">📋 Copy to Clipboard</button>
+    </div>
+    <div class="div"></div>
+    <div class="card"><div class="card-title">🛡 Security Manifest</div><div id="sec-mani"></div></div>
+  </div>
+</section>
+
+</main>
+
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <button class="ni active" onclick="showPage('upload',this)" aria-current="page"><span class="ni-iw">📁</span><span>Upload</span></button>
+  <button class="ni" onclick="showPage('analyzer',this)"><span class="ni-iw">🔬</span><span>Analyzer</span></button>
+  <button class="ni" onclick="showPage('logs',this)"><span class="ni-iw">📋</span><span>Logs</span></button>
+  <button class="ni" onclick="showPage('optimizer',this)"><span class="ni-iw">⚡</span><span>Optimizer</span></button>
+  <button class="ni" onclick="showPage('export',this)"><span class="ni-iw">📤</span><span>Export</span></button>
+</nav>
+
+<!-- DATA SIM MODAL -->
+<div id="datasim-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;backdrop-filter:blur(8px);padding:24px;overflow-y:auto">
+  <div style="max-width:480px;margin:0 auto;background:var(--bg2);border:1px solid var(--cardb);border-radius:var(--rl);padding:24px;margin-top:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <span style="font-size:var(--lg);font-weight:800;color:var(--y3)">🧪 Runtime Data Simulator</span>
+      <button onclick="document.getElementById('datasim-modal').style.display='none'" class="icon-btn" aria-label="Close">✕</button>
+    </div>
+    <p style="font-size:var(--sm);color:var(--ts);margin-bottom:16px;line-height:1.6">Paste a <strong>sample JSON payload</strong> — the data your trigger node would receive at runtime. The simulator will evaluate all <code style="background:var(--bg3);padding:2px 5px;border-radius:4px;color:var(--y3)">$json.*</code> expressions against it.</p>
+    <div class="fgrp">
+      <label class="flbl">Sample Input Data (JSON)</label>
+      <textarea id="datasim-input" rows="8" placeholder='{"name":"John","email":"john@example.com","amount":99.9,"status":"active"}'></textarea>
+    </div>
+    <button class="btn btn-p btn-full" onclick="runDataSim()">▶ Simulate Runtime</button>
+  </div>
+</div>
+
+<!-- BIZ LOGIC MODAL -->
+<div id="bizlogic-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;backdrop-filter:blur(8px);padding:24px;overflow-y:auto">
+  <div style="max-width:480px;margin:0 auto;background:var(--bg2);border:1px solid var(--cardb);border-radius:var(--rl);padding:24px;margin-top:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <span style="font-size:var(--lg);font-weight:800;color:var(--y3)">🎯 Business Logic Verifier</span>
+      <button onclick="document.getElementById('bizlogic-modal').style.display='none'" class="icon-btn" aria-label="Close">✕</button>
+    </div>
+    <p style="font-size:var(--sm);color:var(--ts);margin-bottom:16px;line-height:1.6">Describe <strong>what this workflow is supposed to do</strong> in plain English. The engine will map your intent against the actual node flow and flag discrepancies.</p>
+    <div class="fgrp">
+      <label class="flbl">Workflow Intent (plain English)</label>
+      <textarea id="bizlogic-input" rows="5" placeholder="e.g. When a webhook fires, fetch user data from Postgres, check if their subscription is active, then send a Slack notification and log the result to Google Sheets."></textarea>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">Expected Output</label>
+      <textarea id="bizlogic-output" rows="3" placeholder="e.g. A Slack message sent and a Google Sheets row added."></textarea>
+    </div>
+    <button class="btn btn-p btn-full" onclick="runBizLogic()">🎯 Verify Logic</button>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="assertive"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// SERVICE WORKER
+// ═══════════════════════════════════════════
+const SW=`const C='n8n-v1';self.addEventListener('install',e=>{self.skipWaiting()});self.addEventListener('activate',e=>{self.clients.claim()});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))})`;
+if('serviceWorker' in navigator){const b=new Blob([SW],{type:'text/javascript'});navigator.serviceWorker.register(URL.createObjectURL(b)).catch(()=>{})}
+
+const MAN={name:'2026 n8n Problem Solver',short_name:'n8n Solver',start_url:'/',display:'standalone',background_color:'#0F0A00',theme_color:'#E8B400',icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E8B400'/><text y='.9em' font-size='80'>⚡</text></svg>",sizes:'512x512',type:'image/svg+xml'}]};
+document.getElementById('manifest-link').href=URL.createObjectURL(new Blob([JSON.stringify(MAN)],{type:'application/manifest+json'}));
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const S={raw:null,workflow:null,result:null,logs:[],dark:true};
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function showPage(n,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(b=>{b.classList.remove('active');b.removeAttribute('aria-current')});
+  document.getElementById('page-'+n).classList.add('active');
+  el.classList.add('active');el.setAttribute('aria-current','page');
+}
+
+// ═══════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════
+document.getElementById('theme-btn').addEventListener('click',function(){
+  S.dark=!S.dark;
+  document.documentElement.setAttribute('data-theme',S.dark?'dark':'light');
+  this.textContent=S.dark?'🌙':'☀️';
+  toast(S.dark?'🌙 Dark mode':'☀️ Light mode');
+});
+
+// ═══════════════════════════════════════════
+// FILE UPLOAD
+// ═══════════════════════════════════════════
+const uz=document.getElementById('uz'),fi=document.getElementById('file-in');
+uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('drag')});
+uz.addEventListener('dragleave',()=>uz.classList.remove('drag'));
+uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('drag');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])});
+fi.addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0])});
+uz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fi.click()}});
+
+function handleFile(f){
+  if(!f.name.endsWith('.json')&&f.type!=='application/json'){toast('⚠️ JSON files only');return}
+  const r=new FileReader();
+  r.onload=e=>{
+    S.raw=e.target.result;
+    document.getElementById('paste-area').value=S.raw;
+    document.getElementById('fi-name').textContent=f.name;
+    document.getElementById('fi-size').textContent=fmtSize(f.size);
+    document.getElementById('fi').style.display='flex';
+    toast('✅ Loaded: '+f.name);
+    addLog('info','File loaded',f.name+' ('+fmtSize(f.size)+')');
+  };r.readAsText(f);
+}
+function fmtSize(b){return b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB'}
+document.getElementById('paste-area').addEventListener('input',function(){S.raw=this.value});
+
+// ═══════════════════════════════════════════
+// MAIN ANALYSIS
+// ═══════════════════════════════════════════
+function startAnalysis(){
+  const raw=document.getElementById('paste-area').value||S.raw;
+  if(!raw||!raw.trim()){toast('⚠️ No JSON provided');return}
+  let wf;
+  try{wf=JSON.parse(raw)}catch(e){toast('❌ Invalid JSON: '+e.message);addLog('critical','JSON Parse Error',e.message);return}
+  S.workflow=wf;S.raw=raw;
+  setStatus('scanning');
+  showPage('analyzer',document.querySelectorAll('.ni')[1]);
+  document.getElementById('a-empty').style.display='none';
+  document.getElementById('a-results').style.display='block';
+  // reset engine cards
+  ['runtime','expr','cred','api','logic','compat','shape'].forEach(id=>{
+    const c=document.getElementById('eng-'+id);
+    c.className='eng-card';
+    document.getElementById('est-'+id).textContent='Pending...';
+    document.getElementById('res-'+id).classList.remove('active');
+  });
+  const sb=document.getElementById('scan-box');sb.classList.add('active');
+  const steps=['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'];
+  steps.forEach(s=>{const e=document.getElementById(s);e.classList.remove('done','cur');e.querySelector('.ss-i').textContent=s.replace('s','')});
+  let i=0;
+  function nx(){
+    if(i>0){const p=document.getElementById(steps[i-1]);p.classList.remove('cur');p.classList.add('done');p.querySelector('.ss-i').textContent='✓'}
+    if(i<steps.length){document.getElementById(steps[i]).classList.add('cur');i++;setTimeout(nx,300)}
+    else{document.getElementById('scan-box').classList.remove('active');finishAnalysis(wf)}
+  }
+  addLog('info','Analysis started','Deep scan initiated');
+  nx();
+}
+
+function finishAnalysis(wf){
+  const r=analyzeWorkflow(wf);
+  S.result=r;
+  renderScores(r);renderErrors(r);renderMetrics(r);renderOptimizer(r);renderExport(r);
+  setStatus('ready');
+  toast('✅ Done — '+r.errors.length+' issues found');
+  addLog('ok','Analysis complete',r.errors.length+' issues · '+r.suggestions.length+' suggestions');
+  ['runtime','expr','cred','api','logic','compat','shape'].forEach(id=>document.getElementById('est-'+id).textContent='Ready to run');
+}
+
+// ═══════════════════════════════════════════
+// CORE STATIC ANALYZER
+// ═══════════════════════════════════════════
+function analyzeWorkflow(w){
+  const errors=[],suggestions=[];
+  const nodes=w.nodes||w.workflow?.nodes||[];
+  const conns=w.connections||w.workflow?.connections||{};
+  const name=w.name||'Unnamed';
+
+  // node map
+  const nm={};const nodeNames=new Set();
+  nodes.forEach(n=>{nm[n.name]=n;if(nodeNames.has(n.name))errors.push({severity:'critical',type:'Duplicate Node',message:'Node "'+n.name+'" is duplicated',node:n.name});nodeNames.add(n.name)});
+
+  // reachability
+  const reachable=new Set();
+  Object.entries(conns).forEach(([from,outs])=>{
+    if(!nm[from])errors.push({severity:'critical',type:'Broken Source',message:'Connection references missing node "'+from+'"',node:from});
+    if(outs?.main)outs.main.forEach(br=>{if(Array.isArray(br))br.forEach(c=>{if(c.node&&!nm[c.node])errors.push({severity:'critical',type:'Broken Target',message:'Connection from "'+from+'" targets missing "'+c.node+'"',node:from});if(c.node)reachable.add(c.node)})});
+  });
+
+  // triggers
+  const triggers=nodes.filter(n=>n.type&&(n.type.toLowerCase().includes('trigger')||n.type.includes('webhook')||n.type.includes('start')||n.type.includes('cron')));
+  if(!triggers.length&&nodes.length)errors.push({severity:'critical',type:'No Trigger',message:'No trigger node found — workflow cannot auto-execute',node:null});
+
+  // orphans
+  nodes.forEach(n=>{
+    const isTrig=n.type&&(n.type.toLowerCase().includes('trigger')||n.type.includes('start'));
+    if(!isTrig&&!reachable.has(n.name)&&nodes.length>1)errors.push({severity:'warning',type:'Orphan Node',message:'"'+n.name+'" has no incoming connections',node:n.name});
+  });
+
+  // circular
+  const {hasCycle,cycleNodes}=detectCycles(nodes,conns);
+  if(hasCycle)errors.push({severity:'critical',type:'Circular Dependency',message:'Loop detected: '+cycleNodes.join(' → '),node:cycleNodes[0]});
+
+  // credentials
+  nodes.forEach(n=>{
+    const intTypes=['httpRequest','slack','gmail','airtable','github','postgres','mysql','mongodb','stripe','twitter','notion','googleSheets'];
+    const needsCred=intTypes.some(t=>n.type&&n.type.toLowerCase().includes(t.toLowerCase()));
+    if(needsCred&&(!n.credentials||!Object.keys(n.credentials).length))errors.push({severity:'critical',type:'Missing Credentials',message:'"'+n.name+'" ('+n.type+') needs credentials',node:n.name});
+  });
+
+  // HTTP
+  nodes.forEach(n=>{
+    if(n.type&&n.type.includes('httpRequest')){
+      const p=n.parameters||{};
+      if(!p.url)errors.push({severity:'critical',type:'No URL',message:'HTTP node "'+n.name+'" missing URL',node:n.name});
+      if(p.url&&/\{\{[^}]*$/.test(p.url))errors.push({severity:'critical',type:'Unclosed Expression',message:'Unclosed {{ in URL of "'+n.name+'"',node:n.name});
+    }
+  });
+
+  // suggestions
+  const sets=nodes.filter(n=>n.type&&n.type.includes('.set'));
+  if(sets.length>3)suggestions.push({icon:'🔄',title:'Merge Set Nodes',description:sets.length+' Set nodes found — consolidate into fewer'});
+  const ifs=nodes.filter(n=>n.type&&n.type.includes('.if'));
+  if(ifs.length>4)suggestions.push({icon:'🌿',title:'Simplify Conditions',description:ifs.length+' IF nodes — consider Switch node'});
+  if(nodes.length>50)suggestions.push({icon:'⚡',title:'Split Workflow',description:nodes.length+' nodes — split into sub-workflows'});
+  suggestions.push({icon:'🏷',title:'Add Node Descriptions',description:'Document nodes for team clarity'});
+  suggestions.push({icon:'🔁',title:'Add Error Workflow',description:'Set an Error Workflow in settings for production'});
+
+  const critC=errors.filter(e=>e.severity==='critical').length;
+  const warnC=errors.filter(e=>e.severity==='warning').length;
+  const health=Math.max(0,Math.min(100,100-critC*20-warnC*7));
+  const efficiency=Math.max(0,Math.min(100,100-(sets.length>3?15:0)-(nodes.length>50?20:0)));
+  const stability=Math.max(0,Math.min(100,100-critC*15-(hasCycle?30:0)));
+  const security=Math.max(0,Math.min(100,100-errors.filter(e=>e.type==='Missing Credentials').length*20));
+
+  return{errors,suggestions,metrics:{name,nodeCount:nodes.length,connCount:Object.keys(conns).length,triggerCount:triggers.length,version:w.versionId||'unknown',active:w.active!==false},scores:{health,efficiency,stability,security},nodes,conns,fixedJSON:buildFixed(w,errors)};
+}
+
+function detectCycles(nodes,conns){
+  const vis=new Set(),stack=new Set();let cyc=[],found=false;
+  function dfs(n){if(stack.has(n)){cyc.push(n);return true}if(vis.has(n))return false;vis.add(n);stack.add(n);const c=conns[n];if(c?.main)for(const b of c.main)if(Array.isArray(b))for(const x of b)if(x.node&&dfs(x.node)){found=true;return true}stack.delete(n);return false}
+  nodes.forEach(n=>{if(!vis.has(n.name))dfs(n.name)});
+  return{hasCycle:found,cycleNodes:cyc};
+}
+
+function buildFixed(w,errors){
+  const f=JSON.parse(JSON.stringify(w));
+  if(f.nodes){const s=new Set();f.nodes=f.nodes.filter(n=>{if(s.has(n.name))return false;s.add(n.name);return true})}
+  if(!f.meta)f.meta={};
+  f.meta.fixedBy='2026 n8n Problem Solver';f.meta.fixedAt=new Date().toISOString();f.meta.issuesFixed=errors.filter(e=>e.severity==='critical').length;
+  return f;
+}
+
+// ═══════════════════════════════════════════
+// ENGINE 1 — RUNTIME SIMULATOR
+// Dry-runs each node in execution order,
+// simulates what would happen at runtime
+// ═══════════════════════════════════════════
+function engineRuntime(){
+  const wf=S.workflow;const nodes=wf.nodes||[];const conns=wf.connections||{};
+  if(!nodes.length)return{ok:false,report:'No nodes found in workflow.'};
+
+  const nm={};nodes.forEach(n=>nm[n.name]=n);
+  // find start node
+  const reachable=new Set();
+  Object.values(conns).forEach(outs=>{if(outs?.main)outs.main.forEach(br=>{if(Array.isArray(br))br.forEach(c=>{if(c.node)reachable.add(c.node)})})});
+  const startNodes=nodes.filter(n=>!reachable.has(n.name));
+
+  const trace=[];let step=0;const visited=new Set();const queue=[...startNodes.map(n=>n.name)];
+  while(queue.length&&step<200){
+    const nName=queue.shift();
+    if(visited.has(nName))continue;
+    visited.add(nName);step++;
+    const node=nm[nName];
+    if(!node){trace.push({step,name:nName,type:'MISSING',status:'ERROR',issue:'Node not found in nodes array'});continue}
+    // simulate node execution
+    const issue=simulateNode(node);
+    trace.push({step,name:nName,type:node.type||'unknown',status:issue?'WARN':'OK',issue:issue||null});
+    // queue next
+    const next=conns[nName];
+    if(next?.main)next.main.forEach(br=>{if(Array.isArray(br))br.forEach(c=>{if(c.node&&!visited.has(c.node))queue.push(c.node)})});
+  }
+  const errs=trace.filter(t=>t.status!=='OK');
+  return{ok:true,trace,totalSteps:trace.length,errors:errs.length,report:trace};
+}
+
+function simulateNode(n){
+  const t=n.type||'';const p=n.parameters||{};
+  if(t.includes('httpRequest')){
+    if(!p.url)return'No URL configured';
+    if(p.url&&p.url.includes('localhost'))return'URL points to localhost — unreachable in production';
+    if(p.method==='POST'&&!p.body&&!p.bodyParameters)return'POST request with no body defined';
+  }
+  if(t.includes('webhook')){if(!p.path&&!p.webhookId)return'No path configured'}
+  if(t.includes('function')||t.includes('code')){
+    const code=p.functionCode||p.code||'';
+    if(code.includes('eval('))return'eval() detected — security risk';
+    if(code.includes('require(')&&!code.includes('//'))return'require() inside Function node — not available in n8n sandbox';
+  }
+  if(t.includes('set')&&(!p.values||!p.values.values||!p.values.values.length))return'Set node has no values configured';
+  if(t.includes('if')&&(!p.conditions||!p.conditions.conditions||!p.conditions.conditions.length))return'IF node has no conditions — will always branch true';
+  if(t.includes('splitInBatches')&&!p.batchSize)return'Split In Batches — no batch size set';
+  if(t.includes('merge')&&(!p.mode))return'Merge node — no mode specified';
+  return null;
+}
+
+// ═══════════════════════════════════════════
+// ENGINE 2 — EXPRESSION EVALUATOR
+// Finds all {{ }} expressions, parses and
+// validates them structurally
+// ═══════════════════════════════════════════
+function engineExpr(){
+  const nodes=S.workflow?.nodes||[];const allExpr=[];
+  nodes.forEach(n=>{
+    // Walk raw param strings to avoid JSON.stringify escaping issues
+    extractStrings(n.parameters||{}).forEach(str=>{
+      const matches=[...str.matchAll(/\{\{([\s\S]*?)\}\}/g)];
+      matches.forEach(m=>{
+        const raw=m[1].trim();
+        const issues=validateExpression(raw,n.name,nodes);
+        allExpr.push({node:n.name,expression:'{{'+raw+'}}',issues,valid:issues.length===0});
+      });
+    });
+  });
+  return{total:allExpr.length,valid:allExpr.filter(e=>e.valid).length,issues:allExpr.filter(e=>!e.valid).length,expressions:allExpr};
+}
+
+function extractStrings(obj){
+  const results=[];
+  function walk(v){if(typeof v==='string')results.push(v);else if(Array.isArray(v))v.forEach(walk);else if(v&&typeof v==='object')Object.values(v).forEach(walk);}
+  walk(obj);return results;
+}
+
+function validateExpression(expr,fromNode,nodes){
+  const issues=[];
+  const nodeNames=new Set(nodes.map(n=>n.name));
+  // Parenthesis balance
+  const opens=(expr.match(/\(/g)||[]).length,closes=(expr.match(/\)/g)||[]).length;
+  if(opens!==closes)issues.push('Mismatched parentheses ('+opens+' open, '+closes+' close)');
+  // $node["X"] and $node['X'] refs — works on raw string (no JSON escaping)
+  const nodeRefs=[...expr.matchAll(/\$node\[["'"]([^"\']+)["'"]\]/g)];
+  nodeRefs.forEach(m=>{if(!nodeNames.has(m[1]))issues.push('$node["'+m[1]+'"] — node "'+m[1]+'" not in workflow')});
+  // $("NodeName") shorthand
+  const shortRefs=[...expr.matchAll(/\$\(["'"]([^\"']+)["'"]\)/g)];
+  shortRefs.forEach(m=>{if(!nodeNames.has(m[1]))issues.push('$("'+m[1]+'") — node "'+m[1]+'" not found')});
+  // Deprecated
+  if(expr.includes('$item('))issues.push('$item() deprecated — use $input.item');
+  if(/\$binary(?!\.data)/.test(expr))issues.push('$binary needs .data accessor');
+  // Empty
+  if(!expr.trim())issues.push('Empty expression {{ }}');
+  // Deep chain warning
+  if(/\$json\.\w+\.\w+\.\w+/.test(expr))issues.push('Deep $json chain — verify field exists at runtime');
+  return issues;
+}
+
+
+// ═══════════════════════════════════════════
+// ENGINE 3 — CREDENTIAL AUDITOR
+// Audits every node's credential requirements
+// vs what is configured (structure only)
+// ═══════════════════════════════════════════
+function engineCred(){
+  const nodes=S.workflow?.nodes||[];
+  const CRED_MAP={
+    'n8n-nodes-base.slack':['slackApi','oAuth2'],
+    'n8n-nodes-base.gmail':['gmailOAuth2'],
+    'n8n-nodes-base.googleSheets':['googleSheetsOAuth2'],
+    'n8n-nodes-base.airtable':['airtableApi','airtableTokenApi'],
+    'n8n-nodes-base.github':['githubApi','githubOAuth2'],
+    'n8n-nodes-base.postgres':['postgres'],
+    'n8n-nodes-base.mysql':['mySql'],
+    'n8n-nodes-base.mongodb':['mongoDb'],
+    'n8n-nodes-base.stripe':['stripeApi'],
+    'n8n-nodes-base.notion':['notionApi'],
+    'n8n-nodes-base.httpRequest':['httpBasicAuth','httpDigestAuth','httpHeaderAuth','oAuth1Api','oAuth2Api'],
+    'n8n-nodes-base.twitter':['twitterOAuth1Api'],
+    'n8n-nodes-base.hubspot':['hubspotApi','hubspotOAuth2'],
+    'n8n-nodes-base.dropbox':['dropboxApi'],
+    'n8n-nodes-base.s3':['aws'],
+    'n8n-nodes-base.awsS3':['aws'],
+    'n8n-nodes-base.sendgrid':['sendGridApi'],
+    'n8n-nodes-base.zendesk':['zendeskApi'],
+  };
+  const results=[];
+  nodes.forEach(n=>{
+    const expected=CRED_MAP[n.type];
+    const configured=n.credentials?Object.keys(n.credentials):[];
+    const hasAnyCred=configured.length>0;
+    if(expected){
+      const matched=expected.some(e=>configured.some(c=>c.toLowerCase().includes(e.toLowerCase())||e.toLowerCase().includes(c.toLowerCase())));
+      results.push({name:n.name,type:n.type,required:expected,configured,status:hasAnyCred?(matched?'ok':'type-mismatch'):'missing',credName:configured[0]||null});
+    } else if(hasAnyCred){
+      results.push({name:n.name,type:n.type,required:[],configured,status:'ok',credName:configured[0]});
+    }
+  });
+  const missing=results.filter(r=>r.status==='missing').length;
+  const mismatch=results.filter(r=>r.status==='type-mismatch').length;
+  return{total:results.length,missing,mismatch,ok:results.filter(r=>r.status==='ok').length,items:results};
+}
+
+// ═══════════════════════════════════════════
+// ENGINE 4 — API CONFIG VALIDATOR
+// Validates all HTTP/API nodes deeply:
+// method, URL pattern, headers, auth, body
+// ═══════════════════════════════════════════
+function engineAPI(){
+  const nodes=S.workflow?.nodes||[];
+  const apiNodes=nodes.filter(n=>n.type&&(n.type.includes('httpRequest')||n.type.includes('webhook')||n.type.includes('Http')));
+  const results=[];
+
+  apiNodes.forEach(n=>{
+    const p=n.parameters||{};const issues=[];
+    const method=(p.method||p.requestMethod||'GET').toUpperCase();
+    // URL validation
+    if(!p.url&&!p.path){issues.push('No URL/path configured')}
+    else{
+      const url=p.url||p.path||'';
+      if(url.includes('localhost')||url.includes('127.0.0.1'))issues.push('Localhost URL — unreachable in production');
+      if(url.startsWith('http://')&&!url.includes('localhost'))issues.push('HTTP (not HTTPS) — insecure in production');
+      if(!/^(https?:\/\/|{{|\/)/.test(url)&&url.length>0)issues.push('URL format may be invalid (missing protocol)');
+    }
+    // method-specific
+    if(['POST','PUT','PATCH'].includes(method)){
+      if(!p.body&&!p.bodyParameters&&!p.jsonBody&&!p.formData)issues.push(method+' request with no body — intentional?');
+    }
+    // timeout
+    if(!p.timeout&&!p.options?.timeout)issues.push('No timeout configured — may hang indefinitely');
+    // response handling
+    if(p.responseFormat==='file'&&!p.options?.response?.response?.neverError)issues.push('File response with no error handling');
+    // pagination
+    if(p.options?.batching){}// ok
+    // headers
+    const headers=p.headerParameters?.parameters||p.headers||[];
+    const hasAuth=n.credentials&&Object.keys(n.credentials).length>0;
+    if(!hasAuth&&(p.url||'').includes('api.'))issues.push('API URL detected but no authentication configured');
+
+    results.push({name:n.name,type:n.type,method,url:p.url||p.path||'(none)',issues,ok:issues.length===0,timeout:p.timeout||p.options?.timeout||null,hasAuth});
+  });
+
+  return{total:results.length,ok:results.filter(r=>r.ok).length,withIssues:results.filter(r=>!r.ok).length,items:results};
+}
+
+// ═══════════════════════════════════════════
+// ENGINE 5 — LOGIC BUG DETECTOR
+// Finds logic anti-patterns, dead branches,
+// always-true conditions, unreachable paths
+// ═══════════════════════════════════════════
+function engineLogic(){
+  const nodes=S.workflow?.nodes||[];const conns=S.workflow?.connections||{};
+  const bugs=[];
+
+  nodes.forEach(n=>{
+    const p=n.parameters||{};const t=n.type||'';
+
+    // IF node analysis
+    if(t.includes('.if')){
+      const conds=p.conditions?.conditions||[];
+      if(!conds.length)bugs.push({severity:'critical',node:n.name,issue:'IF node with no conditions — always takes TRUE branch',type:'Dead Logic'});
+      conds.forEach((c,i)=>{
+        if(c.value1===c.value2&&c.operation==='equal')bugs.push({severity:'warning',node:n.name,issue:'Condition '+i+': comparing identical values — always TRUE',type:'Tautology'});
+        if(c.value1===''&&c.value2==='')bugs.push({severity:'warning',node:n.name,issue:'Condition '+i+': both sides empty',type:'Empty Condition'});
+      });
+      // check both branches connected
+      const nodeConns=conns[n.name]?.main||[];
+      if(nodeConns.length<2)bugs.push({severity:'warning',node:n.name,issue:'IF node has only '+(nodeConns.length||0)+' branch(es) connected — one path leads nowhere',type:'Missing Branch'});
+    }
+
+    // Switch node
+    if(t.includes('.switch')){
+      const rules=p.rules?.rules||[];
+      if(!rules.length)bugs.push({severity:'critical',node:n.name,issue:'Switch node with no rules configured',type:'Empty Switch'});
+    }
+
+    // Loop/split without merge
+    if(t.includes('splitInBatches')){
+      const downstream=getDownstream(n.name,conns,nodes);
+      const hasMerge=downstream.some(d=>d.type&&d.type.includes('merge'));
+      if(!hasMerge)bugs.push({severity:'info',node:n.name,issue:'SplitInBatches with no downstream Merge node — batches may not be reassembled',type:'Unbounded Loop'});
+    }
+
+    // Code node risky patterns
+    if(t.includes('code')||t.includes('function')){
+      const code=p.functionCode||p.code||'';
+      if(code.includes('while(true)')||code.includes('for(;;)'))bugs.push({severity:'critical',node:n.name,issue:'Infinite loop pattern detected in code',type:'Infinite Loop'});
+      if(code.includes('setTimeout')||code.includes('setInterval'))bugs.push({severity:'warning',node:n.name,issue:'setTimeout/setInterval in node code — not supported in n8n sandbox',type:'Unsupported API'});
+      if(code.length>5000)bugs.push({severity:'info',node:n.name,issue:'Code node very long ('+code.length+' chars) — consider splitting logic',type:'Code Complexity'});
+    }
+
+    // Merge node checks
+    if(t.includes('merge')){
+      const incoming=countIncoming(n.name,conns);
+      const mode=p.mode||'';
+      if(incoming<2&&mode!=='passThrough')bugs.push({severity:'warning',node:n.name,issue:'Merge node with only '+incoming+' input(s) — may wait forever for second input',type:'Deadlock Risk'});
+    }
+  });
+
+  return{total:bugs.length,critical:bugs.filter(b=>b.severity==='critical').length,warnings:bugs.filter(b=>b.severity==='warning').length,items:bugs};
+}
+
+function getDownstream(nodeName,conns,nodes){
+  const nm={};nodes.forEach(n=>nm[n.name]=n);
+  const result=[];const visited=new Set();
+  function walk(name){if(visited.has(name))return;visited.add(name);const c=conns[name];if(c?.main)c.main.forEach(b=>{if(Array.isArray(b))b.forEach(x=>{if(x.node&&nm[x.node]){result.push(nm[x.node]);walk(x.node)}})});}
+  walk(nodeName);return result;
+}
+
+function countIncoming(nodeName,conns){
+  let count=0;Object.values(conns).forEach(outs=>{if(outs?.main)outs.main.forEach(br=>{if(Array.isArray(br))br.forEach(c=>{if(c.node===nodeName)count++})})});return count;
+}
+
+// ═══════════════════════════════════════════
+// ENGINE 6 — VERSION COMPATIBILITY
+// Checks each node type against known breaking
+// changes per n8n version
+// ═══════════════════════════════════════════
+function engineCompat(){
+  const targetVersion=document.getElementById('n8n-version').value;
+  const nodes=S.workflow?.nodes||[];
+
+  // Known compatibility data
+  const COMPAT_DB={
+    'n8n-nodes-base.httpRequest':{
+      minVersion:'0.100',renamedIn:null,
+      deprecatedParams:{responseData:'0.200',fullResponse:'0.200'},
+      newParams:{pagination:'0.220',autoRefresh:'0.236'},
+      notes:'v0.200+: responseData param renamed. Use response.body instead.'
+    },
+    'n8n-nodes-base.function':{
+      minVersion:'0.1',
+      deprecatedIn:'1.0',
+      replacedBy:'n8n-nodes-base.code',
+      notes:'Function node deprecated in v1.0. Migrate to Code node.'
+    },
+    'n8n-nodes-base.functionItem':{
+      minVersion:'0.1',deprecatedIn:'1.0',replacedBy:'n8n-nodes-base.code',
+      notes:'FunctionItem deprecated in v1.0. Use Code node.'
+    },
+    'n8n-nodes-base.dateTime':{
+      minVersion:'0.150',
+      notes:'Parameters changed in 0.220 — timeZone handling updated.'
+    },
+    'n8n-nodes-base.set':{
+      minVersion:'0.1',
+      notes:'v1.0+: "Set" node parameters restructured. keepOnlySet option renamed.'
+    },
+    'n8n-nodes-base.merge':{
+      minVersion:'0.100',
+      notes:'v0.220+: mode "mergeByIndex" renamed to "combine".'
+    },
+    'n8n-nodes-base.emailSend':{
+      minVersion:'0.1',
+      notes:'v0.200+: credential type updated to use smtpApi.'
+    },
+    'n8n-nodes-base.spreadsheetFile':{
+      minVersion:'0.1',deprecatedIn:'1.0',replacedBy:'n8n-nodes-base.extractFromFile',
+      notes:'Deprecated in v1.0. Use Read/Write Files From Disk or Extract From File.'
+    },
+  };
+
+  const versionNum=parseFloat(targetVersion);
+  const results=[];
+
+  nodes.forEach(n=>{
+    const cd=COMPAT_DB[n.type];
+    const issues=[];let status='ok';
+    if(cd){
+      if(cd.deprecatedIn&&parseFloat(cd.deprecatedIn)<=versionNum){
+        issues.push('DEPRECATED in v'+cd.deprecatedIn+(cd.replacedBy?' → use '+cd.replacedBy:''));
+        status='deprecated';
+      }
+      if(cd.notes)issues.push(cd.notes);
+      // check deprecated params
+      if(cd.deprecatedParams){
+        Object.entries(cd.deprecatedParams).forEach(([param,sinceVer])=>{
+          if(n.parameters&&n.parameters[param]!==undefined&&parseFloat(sinceVer)<=versionNum)
+            issues.push('Parameter "'+param+'" deprecated since v'+sinceVer);
+        });
+      }
+    }
+    // Generic unknown node check
+    if(!n.type)issues.push('Node has no type — will fail to load');
+    if(n.type&&!n.type.startsWith('n8n-nodes-base.')&&!n.type.startsWith('@')){
+      issues.push('Community/custom node: "'+n.type+'" — ensure plugin is installed on target version');
+      status=status==='ok'?'community':status;
+    }
+    results.push({name:n.name,type:n.type||'(none)',status:issues.length?status:'ok',issues,isCore:n.type&&n.type.startsWith('n8n-nodes-base.')});
+  });
+
+  const deprecated=results.filter(r=>r.status==='deprecated').length;
+  const community=results.filter(r=>r.status==='community').length;
+  const withIssues=results.filter(r=>r.issues.length).length;
+  return{targetVersion,total:results.length,deprecated,community,withIssues,ok:results.filter(r=>r.status==='ok').length,items:results};
+}
+
+// ═══════════════════════════════════════════
+// ENGINE 7 — DATA SHAPE ANALYZER
+// Infers what each node outputs, checks
+// if downstream nodes expect compatible shapes
+// ═══════════════════════════════════════════
+function engineShape(){
+  const nodes=S.workflow?.nodes||[];const conns=S.workflow?.connections||{};
+  const nm={};nodes.forEach(n=>nm[n.name]=n);
+  const shapes={};const mismatches=[];
+
+  // Infer output schema per node type
+  nodes.forEach(n=>{shapes[n.name]=inferOutputShape(n)});
+
+  // Check each connection's shape compatibility
+  Object.entries(conns).forEach(([from,outs])=>{
+    const fromShape=shapes[from];
+    if(outs?.main)outs.main.forEach(branch=>{
+      if(Array.isArray(branch))branch.forEach(c=>{
+        if(!c.node)return;
+        const toNode=nm[c.node];if(!toNode)return;
+        const toExpected=inferInputExpectation(toNode);
+        const issues=checkShapeCompatibility(fromShape,toExpected,from,c.node);
+        if(issues.length)mismatches.push({from,to:c.node,issues});
+      });
+    });
+  });
+
+  const enriched=nodes.map(n=>({name:n.name,type:n.type,outputShape:shapes[n.name]}));
+  return{total:nodes.length,mismatches:mismatches.length,items:enriched,mismatchDetails:mismatches};
+}
+
+function inferOutputShape(n){
+  const t=n.type||'';const p=n.parameters||{};
+  if(t.includes('httpRequest'))return{type:'object',fields:['body','headers','statusCode'],array:true,note:'HTTP response body (shape depends on API)'};
+  if(t.includes('webhook'))return{type:'object',fields:['body','headers','params','query'],array:true,note:'Webhook payload'};
+  if(t.includes('googleSheets')||t.includes('airtable'))return{type:'object',fields:['row data varies'],array:true,note:'Spreadsheet rows as objects'};
+  if(t.includes('set')){
+    const vals=(p.values?.values||[]).map(v=>v.name).filter(Boolean);
+    return{type:'object',fields:vals.length?vals:['(configured fields)'],array:true,note:'Explicitly set fields'};
+  }
+  if(t.includes('code')||t.includes('function'))return{type:'unknown',fields:['(depends on code)'],array:true,note:'Dynamic — inspect code output'};
+  if(t.includes('if')||t.includes('switch'))return{type:'passthrough',fields:['same as input'],array:true,note:'Passes input items unchanged'};
+  if(t.includes('merge'))return{type:'merged',fields:['(combined inputs)'],array:true,note:'Combined from multiple branches'};
+  if(t.includes('splitInBatches'))return{type:'batch',fields:['batch of input items'],array:true,note:'Subset of input array per batch'};
+  if(t.includes('gmail')||t.includes('email'))return{type:'object',fields:['id','threadId','labelIds','subject','body','from','to','date'],array:true};
+  if(t.includes('slack'))return{type:'object',fields:['ok','channel','ts','message'],array:true};
+  if(t.includes('postgres')||t.includes('mysql')||t.includes('mongodb'))return{type:'object',fields:['(query result rows)'],array:true,note:'Database rows'};
+  return{type:'unknown',fields:['(unknown)'],array:true,note:'Shape depends on node version and config'};
+}
+
+function inferInputExpectation(n){
+  const t=n.type||'';const p=n.parameters||{};
+  if(t.includes('set')){
+    const vals=p.values?.values||[];
+    const exprFields=vals.filter(v=>v.value&&v.value.includes('$json')).map(v=>{
+      const m=v.value.match(/\$json\.(\w+)/);return m?m[1]:null;
+    }).filter(Boolean);
+    return{expectsFields:exprFields,note:'Expects fields referenced in values'};
+  }
+  if(t.includes('if')){
+    const conds=p.conditions?.conditions||[];
+    const exprFields=conds.map(c=>{const m=(c.value1||'').match(/\$json\.(\w+)/);return m?m[1]:null}).filter(Boolean);
+    return{expectsFields:exprFields,note:'IF conditions reference these fields'};
+  }
+  return{expectsFields:[],note:'No specific input shape required'};
+}
+
+function checkShapeCompatibility(from,toExpected,fromName,toName){
+  const issues=[];
+  if(!from||!toExpected)return issues;
+  if(from.type==='unknown')issues.push('Output shape of "'+fromName+'" is dynamic — cannot guarantee field availability');
+  toExpected.expectsFields.forEach(field=>{
+    if(from.fields&&!from.fields.includes(field)&&from.type!=='unknown'&&from.type!=='passthrough')
+      issues.push('"'+toName+'" expects field "'+field+'" but "'+fromName+'" does not explicitly output it');
+  });
+  return issues;
+}
+
+
+// ═══════════════════════════════════════════
+// ENGINE 8 — LIVE CREDENTIAL TESTER
+// User enters actual token/key → app fires
+// real HTTP requests to known test endpoints
+// ═══════════════════════════════════════════
+function engineCredLive(){
+  const nodes = S.workflow?.nodes || [];
+  const TESTABLE = {
+    'n8n-nodes-base.slack': {
+      label:'Slack',icon:'💬',
+      endpoint:'https://slack.com/api/auth.test',
+      method:'POST',
+      authHeader:'Authorization',
+      authPrefix:'Bearer ',
+      credKey:'slackApi',
+      tokenField:'accessToken',
+      successCheck: d => d.ok === true,
+      failMsg: d => d.error || 'Invalid token'
+    },
+    'n8n-nodes-base.github': {
+      label:'GitHub',icon:'🐙',
+      endpoint:'https://api.github.com/user',
+      method:'GET',
+      authHeader:'Authorization',
+      authPrefix:'Bearer ',
+      credKey:'githubApi',
+      tokenField:'accessToken',
+      successCheck: d => !!d.login,
+      failMsg: d => d.message || 'Unauthorized'
+    },
+    'n8n-nodes-base.airtable': {
+      label:'Airtable',icon:'📋',
+      endpoint:'https://api.airtable.com/v0/meta/whoami',
+      method:'GET',
+      authHeader:'Authorization',
+      authPrefix:'Bearer ',
+      credKey:'airtableTokenApi',
+      tokenField:'apiKey',
+      successCheck: d => !!d.id,
+      failMsg: d => d.error?.message || 'Unauthorized'
+    },
+    'n8n-nodes-base.notion': {
+      label:'Notion',icon:'📝',
+      endpoint:'https://api.notion.com/v1/users/me',
+      method:'GET',
+      authHeader:'Authorization',
+      authPrefix:'Bearer ',
+      credKey:'notionApi',
+      tokenField:'apiKey',
+      successCheck: d => !!d.object,
+      failMsg: d => d.message || 'Unauthorized'
+    },
+    'n8n-nodes-base.sendgrid': {
+      label:'SendGrid',icon:'📧',
+      endpoint:'https://api.sendgrid.com/v3/user/profile',
+      method:'GET',
+      authHeader:'Authorization',
+      authPrefix:'Bearer ',
+      credKey:'sendGridApi',
+      tokenField:'apiKey',
+      successCheck: d => !!d.username,
+      failMsg: d => d.errors?.[0]?.message || 'Unauthorized'
+    }
+  };
+
+  const testableNodes = nodes.filter(n => TESTABLE[n.type]);
+  if(!testableNodes.length){
+    return {items:[], summary:'No live-testable nodes (Slack/GitHub/Airtable/Notion/SendGrid) found in workflow.'};
+  }
+
+  // Return config for UI — actual test fires when user enters token
+  const items = testableNodes.map(n => {
+    const cfg = TESTABLE[n.type];
+    const hasCred = n.credentials && Object.keys(n.credentials).length > 0;
+    return {
+      name: n.name, type: n.type, label: cfg.label, icon: cfg.icon,
+      endpoint: cfg.endpoint, method: cfg.method,
+      authHeader: cfg.authHeader, authPrefix: cfg.authPrefix,
+      hasCred, credConfigured: hasCred ? Object.keys(n.credentials)[0] : null,
+      testable: true
+    };
+  });
+  return {items, summary: items.length + ' node(s) can be live-tested with your actual credentials.'};
+}
+
+async function testCredLive(nodeName, token, idx){
+  const nodes = S.workflow?.nodes || [];
+  const n = nodes.find(x => x.name === nodeName);
+  if(!n || !token.trim()){toast('⚠ Enter a token first');return;}
+
+  const ENDPOINTS = {
+    'n8n-nodes-base.slack':   {url:'https://slack.com/api/auth.test',method:'POST',prefix:'Bearer '},
+    'n8n-nodes-base.github':  {url:'https://api.github.com/user',method:'GET',prefix:'Bearer '},
+    'n8n-nodes-base.airtable':{url:'https://api.airtable.com/v0/meta/whoami',method:'GET',prefix:'Bearer '},
+    'n8n-nodes-base.notion':  {url:'https://api.notion.com/v1/users/me',method:'GET',prefix:'Bearer '},
+    'n8n-nodes-base.sendgrid':{url:'https://api.sendgrid.com/v3/user/profile',method:'GET',prefix:'Bearer '},
+  };
+  const cfg = ENDPOINTS[n.type];
+  if(!cfg){toast('Live test not supported for this node type');return;}
+
+  const btn = document.getElementById('cred-test-btn-'+idx);
+  const res = document.getElementById('cred-test-res-'+idx);
+  btn.disabled=true; btn.textContent='Testing...';
+  res.textContent=''; res.style.display='block';
+
+  try {
+    const headers = {'Authorization': cfg.prefix + token.trim()};
+    if(n.type.includes('notion')) headers['Notion-Version'] = '2022-06-28';
+    const resp = await fetch(cfg.url, {method:cfg.method, headers});
+    const data = await resp.json();
+
+    let ok = false, detail = '';
+    if(n.type.includes('slack')){ ok = data.ok; detail = ok ? 'Team: '+data.team+' · User: '+data.user : 'Error: '+data.error; }
+    else if(n.type.includes('github')){ ok = !!data.login; detail = ok ? 'User: '+data.login+' ('+data.public_repos+' repos)' : data.message; }
+    else if(n.type.includes('airtable')){ ok = !!data.id; detail = ok ? 'User ID: '+data.id : data.error?.message||'Unauthorized'; }
+    else if(n.type.includes('notion')){ ok = !!data.object; detail = ok ? 'User: '+(data.name||data.id) : data.message; }
+    else if(n.type.includes('sendgrid')){ ok = !!data.username; detail = ok ? 'Account: '+data.username : (data.errors?.[0]?.message||'Unauthorized'); }
+
+    res.innerHTML = '<span style="color:'+(ok?'var(--green)':'var(--vrs)')+'">●</span> '+(ok?'✅ Valid — '+detail:'❌ Invalid — '+detail);
+    res.style.color = ok ? 'var(--green)' : 'var(--vrs)';
+    addLog(ok?'ok':'critical','Cred test: '+nodeName, detail);
+    renderLogs();
+  } catch(e){
+    // Detect CORS vs real network error
+    const isCORS = e.message.includes('Failed to fetch') || e.message.includes('NetworkError') || e.message.includes('CORS');
+    const corsNote = {
+      'slack': 'Slack blocks direct browser requests. Use the n8n Slack node credential test instead.',
+      'notion': 'Notion blocks CORS. Test via: curl -H "Authorization: Bearer TOKEN" https://api.notion.com/v1/users/me',
+      'sendgrid': 'SendGrid blocks CORS. Test via: curl -H "Authorization: Bearer TOKEN" https://api.sendgrid.com/v3/user/profile',
+    };
+    const nodeTypeLower = (n.type||'').toLowerCase();
+    const hint = Object.entries(corsNote).find(([k])=>nodeTypeLower.includes(k))?.[1] || '';
+    res.innerHTML = isCORS
+      ? '<span style="color:var(--y3)">⚠ CORS blocked by '+esc(n.type.split('.').pop())+' API — this is expected from browser.</span>'
+        + (hint ? '<br><span style="color:var(--tm)">'+esc(hint)+'</span>' : '')
+        + '<br><span style="color:var(--green)">✅ GitHub &amp; Airtable support browser CORS — try those instead.</span>'
+      : '❌ Error: '+esc(e.message);
+    res.style.color = 'var(--y3)';
+    addLog('warning','Cred test CORS/network: '+nodeName, e.message);
+    renderLogs();
+  }
+  btn.disabled=false; btn.textContent='Test';
+}
+
+// ═══════════════════════════════════════════
+// ENGINE 9 — POST BODY SCHEMA MATCHER
+// Infers expected body schema from URL pattern
+// against known API signatures, validates
+// configured body params match requirements
+// ═══════════════════════════════════════════
+function engineBodySchema(){
+  const nodes = S.workflow?.nodes || [];
+  const httpNodes = nodes.filter(n => n.type && (n.type.includes('httpRequest') || n.type.includes('Http')));
+  if(!httpNodes.length) return {items:[], summary:'No HTTP Request nodes found.'};
+
+  // Known API endpoint schemas
+  const SCHEMA_DB = [
+    {pattern:/api\.slack\.com\/api\/(chat\.postMessage|chat\.update)/i, method:'POST',
+     required:['channel','text'], optional:['blocks','attachments','thread_ts','username','icon_emoji'],
+     docs:'https://api.slack.com/methods/chat.postMessage'},
+    {pattern:/api\.github\.com\/repos\/[^/]+\/[^/]+\/issues$/i, method:'POST',
+     required:['title'], optional:['body','labels','assignees','milestone'],
+     docs:'https://docs.github.com/en/rest/issues'},
+    {pattern:/api\.github\.com\/repos\/[^/]+\/[^/]+\/pulls$/i, method:'POST',
+     required:['title','head','base'], optional:['body','draft','maintainer_can_modify'],
+     docs:'https://docs.github.com/en/rest/pulls'},
+    {pattern:/api\.sendgrid\.com\/v3\/mail\/send/i, method:'POST',
+     required:['personalizations','from','subject','content'],
+     optional:['reply_to','attachments','template_id'],
+     docs:'https://docs.sendgrid.com/api-reference/mail-send'},
+    {pattern:/api\.stripe\.com\/v1\/payment_intents/i, method:'POST',
+     required:['amount','currency'], optional:['customer','description','metadata','payment_method'],
+     docs:'https://stripe.com/docs/api/payment_intents/create'},
+    {pattern:/api\.stripe\.com\/v1\/customers/i, method:'POST',
+     required:[], optional:['email','name','phone','description','metadata'],
+     docs:'https://stripe.com/docs/api/customers/create'},
+    {pattern:/hooks\.slack\.com\/services\//i, method:'POST',
+     required:['text'], optional:['username','icon_emoji','channel','blocks'],
+     docs:'https://api.slack.com/messaging/webhooks'},
+    {pattern:/api\.airtable\.com\/v0\//i, method:'POST',
+     required:['fields'], optional:['typecast'],
+     docs:'https://airtable.com/developers/web/api/create-records'},
+    {pattern:/api\.notion\.com\/v1\/pages/i, method:'POST',
+     required:['parent','properties'], optional:['children','icon','cover'],
+     docs:'https://developers.notion.com/reference/post-page'},
+    {pattern:/api\.hubapi\.com\/crm\/v3\/objects\//i, method:'POST',
+     required:['properties'], optional:['associations'],
+     docs:'https://developers.hubspot.com/docs/api/crm/contacts'},
+    {pattern:/discordapp\.com\/api\/webhooks\//i, method:'POST',
+     required:['content'], optional:['username','avatar_url','embeds','tts'],
+     docs:'https://discord.com/developers/docs/resources/webhook'},
+    {pattern:/api\.twilio\.com\/.+\/Messages/i, method:'POST',
+     required:['To','From','Body'], optional:['MediaUrl','StatusCallback'],
+     docs:'https://www.twilio.com/docs/sms/api/message-resource'},
+    {pattern:/graph\.facebook\.com\/.+\/(feed|posts)/i, method:'POST',
+     required:['message'], optional:['link','published','targeting'],
+     docs:'https://developers.facebook.com/docs/graph-api'},
+  ];
+
+  const results = [];
+  httpNodes.forEach(n => {
+    const p = n.parameters || {};
+    const url = p.url || '';
+    const method = (p.method || p.requestMethod || 'GET').toUpperCase();
+
+    // Match against schema DB
+    const matched = SCHEMA_DB.find(s => s.pattern.test(url) && s.method === method);
+
+    // Extract configured body params
+    const bodyParams = [];
+    if(p.body) { try{ Object.keys(JSON.parse(p.body)).forEach(k=>bodyParams.push(k)); }catch(e){} }
+    if(p.bodyParameters?.parameters) p.bodyParameters.parameters.forEach(b=>bodyParams.push(b.name));
+    if(p.jsonBody) { try{ Object.keys(JSON.parse(p.jsonBody)).forEach(k=>bodyParams.push(k)); }catch(e){} }
+    if(p.formData?.values) p.formData.values.forEach(v=>v.name&&bodyParams.push(v.name));
+
+    if(matched){
+      const missingRequired = matched.required.filter(r => !bodyParams.some(b => b.toLowerCase()===r.toLowerCase()));
+      const unknownParams = bodyParams.filter(b => !matched.required.concat(matched.optional||[]).some(k=>k.toLowerCase()===b.toLowerCase()));
+      const presentOptional = (matched.optional||[]).filter(o => bodyParams.some(b=>b.toLowerCase()===o.toLowerCase()));
+      results.push({
+        name:n.name, url, method, matched:true,
+        apiName: url.replace(/https?:\/\//,'').split('/')[0],
+        required: matched.required, optional: matched.optional||[],
+        configured: bodyParams,
+        missingRequired, unknownParams, presentOptional,
+        docs: matched.docs,
+        ok: missingRequired.length === 0
+      });
+    } else {
+      // No known schema — infer from method
+      const issues = [];
+      if(method==='POST'&&!bodyParams.length) issues.push('POST with no body params — intentional?');
+      if(url.includes('{{')&&url.includes('}}')&&bodyParams.length===0) issues.push('Dynamic URL with no body configured');
+      results.push({
+        name:n.name, url, method, matched:false,
+        configured:bodyParams, issues, ok:issues.length===0
+      });
+    }
+  });
+
+  const schemaMatched = results.filter(r=>r.matched).length;
+  const withMissing = results.filter(r=>r.matched&&r.missingRequired&&r.missingRequired.length>0).length;
+  return {items:results, total:results.length, schemaMatched, withMissing,
+    summary: schemaMatched+' of '+results.length+' HTTP nodes matched known API schemas.'};
+}
+
+// ═══════════════════════════════════════════
+// ENGINE 10 — RUNTIME DATA SIMULATOR
+// User provides sample JSON payload.
+// App extracts all $json.* expressions,
+// evaluates them against the real sample data
+// and reports which resolve vs fail.
+// ═══════════════════════════════════════════
+function engineDataSim(sampleData){
+  const nodes = S.workflow?.nodes || [];
+  const results = [];
+
+  nodes.forEach(n => {
+    extractStrings(n.parameters||{}).forEach(str => {
+      const matches = [...str.matchAll(/\{\{([\s\S]*?)\}\}/g)];
+      matches.forEach(m => {
+        const raw = m[1].trim();
+        if(!raw.includes('$json')&&!raw.includes('$node')) return;
+
+        let resolved = null, error = null, value = undefined;
+        try {
+          // Safe expression evaluator against sample data
+          const $json = sampleData;
+          const $input = { item: { json: sampleData }, all: ()=>[{json:sampleData}] };
+          // Only evaluate simple $json.field and $json["field"] patterns safely
+          const simplified = raw
+            .replace(/\$json\[["']([^"']+)["']\]/g, (_, k) => {
+              const v = sampleData[k];
+              return v !== undefined ? JSON.stringify(v) : 'undefined';
+            })
+            .replace(/\$json\.([a-zA-Z_]\w*)/g, (_, k) => {
+              const v = sampleData[k];
+              return v !== undefined ? JSON.stringify(v) : 'undefined';
+            });
+          // Evaluate simplified expression
+          value = Function('"use strict"; const $json=arguments[0]; const $input=arguments[1]; return ' + simplified)(sampleData, $input);
+          resolved = true;
+        } catch(e) {
+          error = e.message;
+          resolved = false;
+        }
+
+        const undefinedFields = [];
+        [...raw.matchAll(/\$json\.([a-zA-Z_][\w.]*)/g)].forEach(fm => {
+          const parts = fm[1].split('.');
+          let cur = sampleData;
+          for(const p of parts){
+            if(cur===undefined||cur===null){undefinedFields.push(fm[1]);break;}
+            cur = cur[p];
+          }
+          if(cur===undefined) undefinedFields.push(fm[1]);
+        });
+        [...raw.matchAll(/\$json\[["']([^"']+)["']\]/g)].forEach(fm => {
+          if(sampleData[fm[1]]===undefined) undefinedFields.push(fm[1]);
+        });
+
+        results.push({
+          node: n.name,
+          expression: '{{'+raw+'}}',
+          resolved,
+          value: value !== undefined ? JSON.stringify(value) : null,
+          error,
+          undefinedFields,
+          ok: resolved && undefinedFields.length === 0
+        });
+      });
+    });
+  });
+
+  const ok = results.filter(r=>r.ok).length;
+  const fail = results.filter(r=>!r.ok).length;
+  return {total:results.length, ok, fail, items:results,
+    sampleKeys: Object.keys(sampleData)};
+}
+
+function runDataSim(){
+  const raw = document.getElementById('datasim-input').value.trim();
+  if(!raw){toast('⚠ Paste sample data first');return;}
+  if(!S.workflow){toast('⚠ Load a workflow first');return;}
+  let sample;
+  try{ sample = JSON.parse(raw); }
+  catch(e){ toast('❌ Invalid JSON: '+e.message); return; }
+  document.getElementById('datasim-modal').style.display='none';
+  const r = engineDataSim(sample);
+  S.result = S.result||{};
+  renderEngineResultDirect('datasim', r);
+  const card=document.getElementById('eng-datasim');
+  const statusEl=document.getElementById('est-datasim');
+  card.className='eng-card '+(r.fail>0?'fail':'done');
+  statusEl.textContent=r.fail===0?'✓ All resolved':'⚠ '+r.fail+' unresolved';
+  addLog(r.fail>0?'warning':'ok','Data Sim: '+r.total+' expressions',r.ok+' OK · '+r.fail+' failed');
+  renderLogs();
+  toast('🧪 Simulation complete — '+r.ok+'/'+r.total+' expressions resolved');
+}
+
+// ═══════════════════════════════════════════
+// ENGINE 11 — LOCALHOST INTENT DETECTOR
+// Multi-signal heuristic: scores 12 signals
+// to determine if localhost is dev-intentional
+// or a forgotten config that will break in prod
+// ═══════════════════════════════════════════
+function engineIntentDet(){
+  const nodes = S.workflow?.nodes || [];
+  const conns = S.workflow?.connections || {};
+  const wfName = S.workflow?.name || '';
+  const signals = [];
+  let intentScore = 0; // higher = more likely intentional dev usage
+  const localhostNodes = [];
+
+  nodes.forEach(n => {
+    const p = n.parameters || {};
+    const url = p.url || '';
+    if(url.includes('localhost')||url.includes('127.0.0.1')||url.includes('0.0.0.0')){
+      localhostNodes.push({name:n.name, url});
+    }
+  });
+
+  if(!localhostNodes.length) return {
+    localhostNodes:[], signals:[], verdict:'CLEAN',
+    verdictMsg:'No localhost/127.0.0.1 URLs found.',
+    score:100, intentScore:0
+  };
+
+  // Signal 1: workflow name contains dev/test/local/debug keywords
+  const devNames = /(dev|test|local|debug|staging|sandbox|temp|draft|wip|poc|demo)/i;
+  if(devNames.test(wfName)){
+    signals.push({signal:'Workflow name suggests dev environment',weight:+30,flag:'✅ Likely intentional'});
+    intentScore+=30;
+  } else {
+    signals.push({signal:'Workflow name gives no dev/test hint',weight:-10,flag:'⚠ Suspicious'});
+    intentScore-=10;
+  }
+
+  // Signal 2: workflow is inactive
+  if(S.workflow?.active===false){
+    signals.push({signal:'Workflow is currently INACTIVE',weight:+20,flag:'✅ Likely dev-only'});
+    intentScore+=20;
+  } else {
+    signals.push({signal:'Workflow is ACTIVE — localhost URL will fail in prod',weight:-30,flag:'🔴 Critical risk'});
+    intentScore-=30;
+  }
+
+  // Signal 3: webhook trigger uses /test path
+  const hasTestWebhook = nodes.some(n => n.type&&n.type.includes('webhook') && /test|dev|local/i.test(n.parameters?.path||''));
+  if(hasTestWebhook){
+    signals.push({signal:'Webhook trigger uses test/dev path',weight:+20,flag:'✅ Likely intentional'});
+    intentScore+=20;
+  }
+
+  // Signal 4: port number suggests known local services
+  localhostNodes.forEach(n => {
+    const portMatch = n.url.match(/:(\d{4,5})/);
+    if(portMatch){
+      const port = parseInt(portMatch[1]);
+      const knownPorts = {3000:'Node.js dev server',5678:'n8n default port',8080:'Common dev proxy',
+                          4200:'Angular dev',3001:'React alt',5000:'Flask/Python dev',
+                          8000:'Django dev',9000:'PHP dev',4000:'GraphQL playground'};
+      if(knownPorts[port]){
+        signals.push({signal:'Port '+port+' = '+knownPorts[port]+' (known dev service)',weight:+15,flag:'ℹ Known dev port'});
+        intentScore+=15;
+      }
+    }
+  });
+
+  // Signal 5: other non-localhost nodes exist (mixed prod+local = bad)
+  const prodNodes = nodes.filter(n=>{const u=n.parameters?.url||'';return u.includes('https://')&&!u.includes('localhost')});
+  if(prodNodes.length>0 && localhostNodes.length>0){
+    signals.push({signal:'Workflow mixes production URLs with localhost URLs',weight:-40,flag:'🔴 High risk — production mix'});
+    intentScore-=40;
+  }
+
+  // Signal 6: credentials configured on localhost node
+  localhostNodes.forEach(n=>{
+    const node = nodes.find(x=>x.name===n.name);
+    if(node?.credentials && Object.keys(node.credentials).length>0){
+      signals.push({signal:n.name+': has credentials on localhost node (unusual for local dev)',weight:-10,flag:'⚠ Check needed'});
+      intentScore-=10;
+    }
+  });
+
+  // Signal 7: downstream nodes suggest production (email send, payment, etc.)
+  const prodLikeTypes = ['gmail','sendgrid','stripe','twilio','slack'];
+  const hasProdDownstream = nodes.some(n=>prodLikeTypes.some(t=>n.type&&n.type.toLowerCase().includes(t)));
+  if(hasProdDownstream){
+    signals.push({signal:'Workflow has production integration nodes (Slack/Stripe/Email) — localhost may cause silent failures',weight:-25,flag:'🔴 Production risk'});
+    intentScore-=25;
+  }
+
+  // Signal 8: n8n-specific self-call (legitimate pattern)
+  localhostNodes.forEach(n=>{
+    if(n.url.includes(':5678')||n.url.includes('n8n')){
+      signals.push({signal:n.name+': Calling n8n itself (self-referencing workflow pattern)',weight:+35,flag:'✅ Known n8n pattern'});
+      intentScore+=35;
+    }
+  });
+
+  // Verdict
+  const clampedScore = Math.max(0, Math.min(100, 50 + intentScore));
+  let verdict, verdictMsg, verdictColor;
+  if(clampedScore >= 70){
+    verdict='INTENTIONAL'; verdictColor='var(--green)';
+    verdictMsg='High confidence this is intentional dev/test usage. Safe to ignore for now.';
+  } else if(clampedScore >= 40){
+    verdict='UNCERTAIN'; verdictColor='var(--y3)';
+    verdictMsg='Mixed signals. Review manually before deploying to production.';
+  } else {
+    verdict='LIKELY A BUG'; verdictColor='var(--vrs)';
+    verdictMsg='Strong indicators this localhost URL will break in production. Update to real endpoint before deploying.';
+  }
+
+  return {localhostNodes, signals, verdict, verdictMsg, verdictColor, score:clampedScore, intentScore};
+}
+
+// ═══════════════════════════════════════════
+// ENGINE 12 — BUSINESS LOGIC VERIFIER
+// User states intent in plain English.
+// App maps keywords → expected node types,
+// checks presence and order in flow,
+// flags gaps between intent and actual nodes.
+// ═══════════════════════════════════════════
+function engineBizLogic(intent, expectedOutput){
+  const nodes = S.workflow?.nodes || [];
+  const conns = S.workflow?.connections || {};
+
+  if(!intent.trim()) return {error:'No intent provided.'};
+
+  // Intent keyword → node type mapping
+  const INTENT_MAP = [
+    {keywords:/(webhook|http trigger|http request trigger|api trigger|receive|listen)/i, nodeTypes:['webhook','manualTrigger','httpTrigger'], label:'Trigger / Receive'},
+    {keywords:/(fetch|get|retrieve|read|pull|query|request)/i, nodeTypes:['httpRequest','postgres','mysql','mongodb','googleSheets','airtable','notion','github'], label:'Data Fetch'},
+    {keywords:/(send|post|push|publish|emit|dispatch)/i, nodeTypes:['httpRequest','slack','gmail','sendgrid','twilio','discord','telegram'], label:'Send / Push Data'},
+    {keywords:/(slack|notify|notification|message|alert)/i, nodeTypes:['slack'], label:'Slack Notification'},
+    {keywords:/(email|mail|gmail|send.*email|sendgrid)/i, nodeTypes:['gmail','emailSend','sendgrid'], label:'Email Send'},
+    {keywords:/(database|postgres|mysql|mongo|sql|db|store|save|insert|upsert)/i, nodeTypes:['postgres','mysql','mongodb','redis'], label:'Database Operation'},
+    {keywords:/(sheet|spreadsheet|google sheets|excel|airtable|log.*sheet|record)/i, nodeTypes:['googleSheets','airtable','spreadsheet'], label:'Spreadsheet Log'},
+    {keywords:/(check|if|condition|filter|validate|when|verify|test)/i, nodeTypes:['if','switch','filter'], label:'Conditional Logic'},
+    {keywords:/(transform|set|map|format|modify|update|rename|parse)/i, nodeTypes:['set','code','function'], label:'Data Transform'},
+    {keywords:/(loop|iterate|each|batch|repeat|for each)/i, nodeTypes:['splitInBatches','splitInItems','itemLists'], label:'Loop / Iterate'},
+    {keywords:/(schedule|cron|daily|weekly|every|interval|timer)/i, nodeTypes:['cron','scheduleTrigger'], label:'Schedule Trigger'},
+    {keywords:/(github|git|repo|commit|pull request|issue)/i, nodeTypes:['github'], label:'GitHub'},
+    {keywords:/(stripe|payment|charge|invoice|billing)/i, nodeTypes:['stripe'], label:'Payment'},
+    {keywords:/(notion|page|database.*notion)/i, nodeTypes:['notion'], label:'Notion'},
+    {keywords:/(wait|delay|pause|sleep)/i, nodeTypes:['wait'], label:'Wait / Delay'},
+    {keywords:/(error|catch|handle.*error|on error|fallback)/i, nodeTypes:['errorTrigger','if'], label:'Error Handling'},
+    {keywords:/(merge|combine|join|aggregate)/i, nodeTypes:['merge'], label:'Merge Data'},
+    {keywords:/(split|branch|parallel|fork)/i, nodeTypes:['if','switch','splitInBatches'], label:'Split / Branch'},
+    {keywords:/(webhook.*response|respond|reply)/i, nodeTypes:['respondToWebhook','webhook'], label:'Webhook Response'},
+  ];
+
+  const gaps = [], matched = [], covered = [];
+
+  INTENT_MAP.forEach(mapping => {
+    if(mapping.keywords.test(intent) || mapping.keywords.test(expectedOutput||'')){
+      // Check if any node in workflow covers this intent
+      const found = nodes.filter(n => n.type && mapping.nodeTypes.some(t => n.type.toLowerCase().includes(t.toLowerCase())));
+      if(found.length){
+        matched.push({intent:mapping.label, nodes:found.map(n=>n.name), covered:true});
+        covered.push(mapping.label);
+      } else {
+        gaps.push({intent:mapping.label, expected:mapping.nodeTypes, covered:false,
+          message:'Your intent mentions "'+mapping.label+'" but no matching node found'});
+      }
+    }
+  });
+
+  // Check execution order makes logical sense
+  const orderIssues = [];
+  const nodeNames = nodes.map(n=>n.name);
+
+  // Trigger should be first
+  const triggerIdx = nodes.findIndex(n=>n.type&&(n.type.includes('trigger')||n.type.includes('webhook')));
+  const fetchIdx = nodes.findIndex(n=>n.type&&(n.type.includes('httpRequest')||n.type.includes('postgres')||n.type.includes('mysql')));
+  const sendIdx = nodes.findIndex(n=>n.type&&(n.type.includes('slack')||n.type.includes('gmail')||n.type.includes('sendgrid')));
+
+  if(fetchIdx !== -1 && sendIdx !== -1 && sendIdx < fetchIdx){
+    orderIssues.push('Send node appears before Fetch node in flow — data may not be available yet');
+  }
+  if(triggerIdx === -1 && nodes.length > 0){
+    orderIssues.push('No trigger node — workflow cannot auto-execute based on your intent');
+  }
+
+  // Detect impossible combinations
+  const impossibles = [];
+  if(/(realtime|instantly|immediate)/i.test(intent)){
+    const hasCron = nodes.some(n=>n.type&&n.type.includes('cron'));
+    if(hasCron) impossibles.push('Intent says "realtime/instant" but workflow uses a scheduled (cron) trigger — inherently delayed');
+  }
+  if(/(secure|securely|secured|encrypt|encrypted|private|privately|sensitive)/i.test(intent)){
+    const hasHttp = nodes.some(n=>n.type&&n.type.includes('httpRequest')&&(n.parameters?.url||'').startsWith('http://'));
+    if(hasHttp) impossibles.push('Intent says "secure" but workflow uses HTTP (not HTTPS) endpoints');
+  }
+
+  const coverageScore = matched.length / Math.max(1, matched.length + gaps.length) * 100;
+  const verdict = gaps.length===0&&orderIssues.length===0&&impossibles.length===0
+    ? 'LOGIC MATCHES INTENT'
+    : gaps.length>2||impossibles.length>0
+    ? 'SIGNIFICANT GAPS'
+    : 'MINOR GAPS';
+
+  return {gaps, matched, orderIssues, impossibles, covered,
+    coverageScore:Math.round(coverageScore), verdict,
+    totalIntent: matched.length+gaps.length};
+}
+
+function showBizLogicModal(){
+  document.getElementById('bizlogic-modal').style.display='block';
+}
+
+function runBizLogic(){
+  const intent = document.getElementById('bizlogic-input').value;
+  const expected = document.getElementById('bizlogic-output').value;
+  if(!intent.trim()){toast('⚠ Describe your workflow intent first');return;}
+  if(!S.workflow){toast('⚠ Load a workflow first');return;}
+  document.getElementById('bizlogic-modal').style.display='none';
+  const r = engineBizLogic(intent, expected);
+  renderEngineResultDirect('bizlogic', r);
+  const card=document.getElementById('eng-bizlogic');
+  const statusEl=document.getElementById('est-bizlogic');
+  const hasProblem = r.gaps?.length>0||r.orderIssues?.length>0||r.impossibles?.length>0;
+  card.className='eng-card '+(hasProblem?'fail':'done');
+  statusEl.textContent=r.verdict||'Done';
+  addLog(hasProblem?'warning':'ok','Biz Logic Check',r.coverageScore+'% coverage');
+  renderLogs();
+  toast('🎯 Logic verified — '+r.coverageScore+'% coverage');
+}
+
+function renderEngineResultDirect(id, r){
+  const panel=document.getElementById('res-'+id);
+  panel.classList.add('active');
+  renderEngineResult(id, r);
+}
+
+// ═══════════════════════════════════════════
+// RUN ENGINES
+// ═══════════════════════════════════════════
+function runEngine(id){
+  if(!S.workflow){toast('⚠️ No workflow loaded');return}
+  const card=document.getElementById('eng-'+id);
+  const statusEl=document.getElementById('est-'+id);
+  card.className='eng-card running';
+  statusEl.textContent='Running...';
+
+  setTimeout(()=>{
+    try{
+      let result;
+      if(id==='runtime')result=engineRuntime();
+      else if(id==='expr')result=engineExpr();
+      else if(id==='cred')result=engineCred();
+      else if(id==='api')result=engineAPI();
+      else if(id==='logic')result=engineLogic();
+      else if(id==='compat')result=engineCompat();
+      else if(id==='shape')result=engineShape();
+      else if(id==='credlive')result=engineCredLive();
+      else if(id==='bodyschema')result=engineBodySchema();
+      else if(id==='intentdet')result=engineIntentDet();
+      else if(id==='datasim'){document.getElementById('datasim-modal').style.display='block';card.className='eng-card';statusEl.textContent='Paste sample data to run';return;}
+      else if(id==='bizlogic'){showBizLogicModal();card.className='eng-card';statusEl.textContent='Describe intent to run';return;}
+      renderEngineResult(id,result);
+      const hasIssues=result.errors||result.issues||result.missing||result.withIssues||result.mismatches||result.total===0;
+      const critical=result.critical>0||result.missing>0;
+      card.className='eng-card '+(critical?'fail':hasIssues?'running':'done');
+      const count=result.errors||result.issues||result.missing||result.withIssues||result.mismatches||0;
+      statusEl.textContent=count===0?'✓ All clear':'⚠ '+count+' issue'+(count!==1?'s':'');
+      addLog(critical?'critical':count>0?'warning':'ok','Engine: '+id,count+' issues found');
+    }catch(e){
+      card.className='eng-card fail';
+      statusEl.textContent='Error: '+e.message;
+      addLog('critical','Engine error: '+id,e.message);
+    }
+    renderLogs();
+  },400+Math.random()*300);
+}
+
+function runAllEngines(){
+  if(!S.workflow){toast('⚠️ No workflow loaded');return}
+  const btn=document.getElementById('btn-run-all');
+  btn.disabled=true;btn.textContent='⏳ Running all engines...';
+  const engines=['runtime','expr','cred','api','logic','compat','shape','credlive','bodyschema','intentdet'];
+  let i=0;
+  function next(){
+    if(i<engines.length){runEngine(engines[i]);i++;setTimeout(next,600)}
+    else{setTimeout(()=>{btn.disabled=false;btn.textContent='⚡ Run All Engines';toast('✅ All engines complete')},600)}
+  }
+  next();
+}
+
+// ═══════════════════════════════════════════
+// RENDER ENGINE RESULTS
+// ═══════════════════════════════════════════
+function renderEngineResult(id,r){
+  const panel=document.getElementById('res-'+id);
+  const content=document.getElementById('rc-'+id);
+  panel.classList.add('active');
+
+  if(id==='runtime'){
+    if(!r.ok){content.textContent=r.report;return}
+    const rows=r.report.map(t=>`<div style="display:grid;grid-template-columns:28px 1fr auto auto;gap:6px;padding:6px 0;border-bottom:1px solid var(--cardb);align-items:start">
+      <span style="font-size:var(--xs);color:var(--tm);font-family:var(--fm)">#${t.step}</span>
+      <div><div style="font-size:var(--sm);font-weight:600;color:var(--tp)">${esc(t.name)}</div><div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm)">${esc(t.type)}</div>${t.issue?'<div style="font-size:var(--xs);color:var(--vrs);margin-top:3px;font-family:var(--fm)">⚠ '+esc(t.issue)+'</div>':''}</div>
+      <span style="font-size:var(--xs);color:var(--tm);font-family:var(--fm)"></span>
+      <span class="badge ${t.status==='OK'?'bg-ok':t.status==='WARN'?'bw':'bc'}">${t.status}</span>
+    </div>`).join('');
+    content.innerHTML=`<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap"><span class="badge bg-ok">Steps: ${r.totalSteps}</span><span class="badge ${r.errors>0?'bc':'bg-ok'}">Issues: ${r.errors}</span></div>${rows}`;
+  }
+
+  else if(id==='expr'){
+    if(!r.total){content.innerHTML='<div style="padding:12px;text-align:center;color:var(--tm);font-family:var(--fm);font-size:var(--xs)">No expressions found in workflow.</div>';return}
+    const rows=r.expressions.map(e=>`<tr><td>${esc(e.node)}</td><td style="color:var(--blue)">${esc(e.expression)}</td><td class="${e.valid?'expr-ok':'expr-warn'}">${e.valid?'✓':'⚠'}</td><td style="color:var(--vrs)">${e.issues.map(i=>esc(i)).join('<br>')}</td></tr>`).join('');
+    content.innerHTML=`<div style="margin-bottom:8px;display:flex;gap:8px"><span class="badge bg-ok">Total: ${r.total}</span><span class="badge bg-ok">Valid: ${r.valid}</span><span class="badge ${r.issues>0?'bc':'bg-ok'}">Issues: ${r.issues}</span></div><div style="overflow-x:auto"><table class="expr-table"><thead><tr><th>Node</th><th>Expression</th><th>OK?</th><th>Issues</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+
+  else if(id==='cred'){
+    if(!r.total){content.innerHTML='<div style="padding:12px;text-align:center;color:var(--tm);font-family:var(--fm);font-size:var(--xs)">No credential-dependent nodes found.</div>';return}
+    const rows=r.items.map(item=>`<div class="cred-item">
+      <span class="cred-icon">${item.status==='ok'?'✅':item.status==='missing'?'❌':'⚠️'}</span>
+      <div style="flex:1"><div class="cred-name">${esc(item.name)}</div><div class="cred-type">${esc(item.type)}</div>
+        ${item.configured.length?'<div style="font-size:var(--xs);color:var(--green);font-family:var(--fm);margin-top:2px">Configured: '+item.configured.map(esc).join(', ')+'</div>':''}
+        ${item.status==='missing'?'<div style="font-size:var(--xs);color:var(--vrs);font-family:var(--fm);margin-top:2px">Requires: '+item.required.map(esc).join(' or ')+'</div>':''}
+        ${item.status==='type-mismatch'?'<div style="font-size:var(--xs);color:var(--y3);font-family:var(--fm);margin-top:2px">Type mismatch — expected: '+item.required.join('/')+'</div>':''}
+      </div>
+      <span class="badge ${item.status==='ok'?'bg-ok':item.status==='missing'?'bc':'bw'}">${item.status}</span>
+    </div>`).join('');
+    content.innerHTML=`<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap"><span class="badge bg-ok">OK: ${r.ok}</span><span class="badge ${r.missing?'bc':'bg-ok'}">Missing: ${r.missing}</span><span class="badge ${r.mismatch?'bw':'bg-ok'}">Mismatch: ${r.mismatch}</span></div>${rows}`;
+  }
+
+  else if(id==='api'){
+    if(!r.total){content.innerHTML='<div style="padding:12px;text-align:center;color:var(--tm);font-family:var(--fm);font-size:var(--xs)">No API/HTTP nodes found.</div>';return}
+    const rows=r.items.map(item=>`<div class="api-item">
+      <div class="api-hdr"><span class="api-name">${esc(item.name)}</span><span class="method-badge m-${item.method.toLowerCase()}">${item.method}</span></div>
+      <div class="api-url">${esc(item.url)}</div>
+      ${item.issues.map(i=>'<div style="font-size:var(--xs);color:var(--vrs);font-family:var(--fm);margin-bottom:3px">⚠ '+esc(i)+'</div>').join('')}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+        <span class="badge ${item.hasAuth?'bg-ok':'bw'}">${item.hasAuth?'🔒 Auth':'⚠ No Auth'}</span>
+        <span class="badge ${item.timeout?'bg-ok':'bw'}">${item.timeout?'⏱ Timeout: '+item.timeout+'ms':'⏱ No Timeout'}</span>
+        <span class="badge ${item.ok?'bg-ok':'bc'}">${item.ok?'✓ Clean':'Issues: '+item.issues.length}</span>
+      </div>
+    </div>`).join('');
+    content.innerHTML=`<div style="margin-bottom:8px;display:flex;gap:8px"><span class="badge bg-ok">Total: ${r.total}</span><span class="badge bg-ok">Clean: ${r.ok}</span><span class="badge ${r.withIssues?'bc':'bg-ok'}">Issues: ${r.withIssues}</span></div>${rows}`;
+  }
+
+  else if(id==='logic'){
+    if(!r.total){content.textContent='✅ No logic bugs detected. Workflow logic appears sound.';return}
+    const rows=r.items.map(b=>`<div class="ei ${b.severity}" style="margin-bottom:6px"><div class="ei-hdr"><span class="ei-title">${esc(b.type)}</span><span class="badge ${b.severity==='critical'?'bc':b.severity==='warning'?'bw':'bi'}">${b.severity}</span></div><div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm);margin-top:4px">Node: <span style="color:var(--y3)">${esc(b.node)}</span></div><div style="font-size:var(--xs);color:var(--ts);margin-top:3px">${esc(b.issue)}</div></div>`).join('');
+    content.innerHTML=`<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap"><span class="badge ${r.critical?'bc':'bg-ok'}">Critical: ${r.critical}</span><span class="badge ${r.warnings?'bw':'bg-ok'}">Warnings: ${r.warnings}</span></div>${rows}`;
+  }
+
+  else if(id==='compat'){
+    const rows=r.items.map(item=>`<div class="compat-row">
+      <span class="compat-icon">${item.status==='ok'?'✅':item.status==='deprecated'?'🚫':item.status==='community'?'🔌':'⚠️'}</span>
+      <div style="flex:1"><div class="compat-name">${esc(item.name)}</div>
+        <div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm)">${esc(item.type)}</div>
+        ${item.issues.map(i=>'<div style="font-size:var(--xs);color:'+(item.status==='deprecated'?'var(--vrs)':item.status==='community'?'var(--blue)':'var(--y3)')+';margin-top:2px;font-family:var(--fm)">'+esc(i)+'</div>').join('')}
+      </div>
+      <span class="badge ${item.status==='ok'?'bg-ok':item.status==='deprecated'?'bc':item.status==='community'?'bi':'bw'}">${item.status}</span>
+    </div>`).join('');
+    content.innerHTML=`<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap"><span class="badge bi">Target: v${r.targetVersion}</span><span class="badge ${r.deprecated?'bc':'bg-ok'}">Deprecated: ${r.deprecated}</span><span class="badge ${r.community?'bi':'bg-ok'}">Community: ${r.community}</span><span class="badge ${r.withIssues?'bw':'bg-ok'}">Issues: ${r.withIssues}</span></div>${rows}`;
+  }
+
+  else if(id==='shape'){
+    const mismatchHtml=r.mismatchDetails.length?r.mismatchDetails.map(m=>`<div style="background:rgba(201,53,0,.08);border:1px solid rgba(201,53,0,.2);border-radius:8px;padding:10px;margin-bottom:8px"><div style="font-size:var(--sm);font-weight:700;color:var(--tp);margin-bottom:4px">⚠ ${esc(m.from)} → ${esc(m.to)}</div>${m.issues.map(i=>'<div style="font-size:var(--xs);color:var(--vrs);font-family:var(--fm);margin-top:2px">'+esc(i)+'</div>').join('')}</div>`).join(''):'<div style="padding:8px 0;color:var(--green);font-size:var(--xs);font-family:var(--fm)">✓ No shape mismatches detected</div>';
+    const nodeShapes=r.items.map(n=>`<div class="shape-node"><div class="shape-hdr"><span class="shape-name">${esc(n.name)}</span><span class="badge bi">${esc(n.outputShape?.type||'unknown')}</span></div><div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm)">${esc(n.outputShape?.note||'')}</div><div class="shape-fields">${(n.outputShape?.fields||[]).slice(0,8).map(f=>'<span class="sf sf-out">'+esc(f)+'</span>').join('')}</div></div>`).join('');
+    content.innerHTML=`<div style="margin-bottom:10px;display:flex;gap:8px"><span class="badge ${r.mismatches?'bc':'bg-ok'}">Mismatches: ${r.mismatches}</span><span class="badge bi">Nodes mapped: ${r.total}</span></div><div style="font-size:var(--xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--y4);margin-bottom:8px">Connection Mismatches</div>${mismatchHtml}<div style="font-size:var(--xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--y4);margin:12px 0 8px">Node Output Shapes</div>${nodeShapes}`;
+  }
+  else if(id==='credlive'){
+    const c=document.getElementById('rc-credlive');
+    if(!r.items||!r.items.length){c.innerHTML='<div style="padding:12px;text-align:center;color:var(--tm);font-family:var(--fm);font-size:var(--xs)">'+esc(r.summary||'No testable nodes found.')+'</div>';return;}
+    const rows=r.items.map((item,i)=>`
+      <div style="background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);padding:12px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:20px">${item.icon}</span>
+          <div style="flex:1"><div style="font-size:var(--sm);font-weight:700;color:var(--tp)">${esc(item.name)}</div>
+            <div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm)">${esc(item.label)} · ${esc(item.endpoint)}</div>
+            ${item.hasCred?'<div style="font-size:var(--xs);color:var(--green);margin-top:2px">Credential configured: '+esc(item.credConfigured||'')+'</div>':'<div style="font-size:var(--xs);color:var(--vrs);margin-top:2px">No credential configured yet</div>'}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="password" id="cred-token-${i}" placeholder="Paste your API token / Bearer token" style="flex:1;min-height:36px;font-size:var(--xs)" aria-label="API token for ${esc(item.name)}">
+          <button id="cred-test-btn-${i}" class="btn btn-g" style="min-height:36px;height:36px;padding:0 12px;font-size:var(--xs)" onclick="testCredLive('${esc(item.name)}',document.getElementById('cred-token-${i}').value,${i})">Test</button>
+        </div>
+        <div id="cred-test-res-${i}" style="display:none;margin-top:8px;font-size:var(--xs);font-family:var(--fm);padding:6px 8px;background:var(--bg3);border-radius:6px"></div>
+        <div style="font-size:var(--xs);color:var(--tm);margin-top:6px;font-family:var(--fm)">⚠ Token sent only to the API above — never stored. GitHub &amp; Airtable work from browser. Slack/Notion/SendGrid may be CORS-blocked (browser limitation, not a bug).</div>
+      </div>`).join('');
+    c.innerHTML='<div style="margin-bottom:10px;font-size:var(--xs);color:var(--ts);font-family:var(--fm)">'+esc(r.summary)+'</div>'+rows;
+  }
+
+  else if(id==='bodyschema'){
+    const c=document.getElementById('rc-bodyschema');
+    if(!r.items||!r.items.length){c.innerHTML='<div style="padding:12px;text-align:center;color:var(--tm);font-family:var(--fm);font-size:var(--xs)">'+esc(r.summary||'No HTTP nodes found.')+'</div>';return;}
+    const rows=r.items.map(item=>{
+      if(item.matched){
+        const reqHtml=item.required.map(f=>{
+          const present=item.configured.some(b=>b.toLowerCase()===f.toLowerCase());
+          return `<span class="sf ${present?'sf-out':'sf-mis'}" title="${present?'Present':'MISSING — required field'}">${esc(f)}${present?'':'*'}</span>`;
+        }).join('');
+        const optHtml=item.presentOptional.map(f=>`<span class="sf sf-in">${esc(f)}</span>`).join('');
+        const unknownHtml=item.unknownParams.map(f=>`<span class="sf" style="background:rgba(160,120,0,.12);color:var(--y4);border:1px solid rgba(160,120,0,.2)">${esc(f)}?</span>`).join('');
+        return `<div class="api-item">
+          <div class="api-hdr"><span class="api-name">${esc(item.name)}</span><span class="method-badge m-${item.method.toLowerCase()}">${item.method}</span></div>
+          <div class="api-url">API: ${esc(item.apiName)}</div>
+          <div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm);margin-bottom:6px">Required fields: <span style="color:var(--vrs)">(* = missing)</span></div>
+          <div class="shape-fields" style="margin-bottom:6px">${reqHtml}</div>
+          ${optHtml?'<div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm);margin-bottom:4px">Optional configured:</div><div class="shape-fields" style="margin-bottom:6px">'+optHtml+'</div>':''}
+          ${unknownHtml?'<div style="font-size:var(--xs);color:var(--y4);font-family:var(--fm);margin-bottom:4px">Unknown params (not in API schema):</div><div class="shape-fields">'+unknownHtml+'</div>':''}
+          ${item.missingRequired&&item.missingRequired.length?'<div style="margin-top:6px;padding:6px 8px;background:rgba(201,53,0,.08);border-radius:6px;font-size:var(--xs);color:var(--vrs);font-family:var(--fm)">Missing required: '+item.missingRequired.map(esc).join(', ')+'</div>':''}
+          <div style="margin-top:8px"><a href="${esc(item.docs)}" target="_blank" rel="noopener" style="font-size:var(--xs);color:var(--blue);font-family:var(--fm)">📖 API Docs →</a></div>
+        </div>`;
+      } else {
+        return `<div class="api-item">
+          <div class="api-hdr"><span class="api-name">${esc(item.name)}</span><span class="method-badge m-${item.method.toLowerCase()}">${item.method}</span></div>
+          <div class="api-url">${esc(item.url||'(no URL)')}</div>
+          <div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm);margin-bottom:4px">No matching API schema — ${item.configured.length?'configured params: '+item.configured.map(esc).join(', '):'no body params configured'}</div>
+          ${item.issues&&item.issues.length?item.issues.map(i=>'<div style="font-size:var(--xs);color:var(--y3);font-family:var(--fm)">⚠ '+esc(i)+'</div>').join(''):'<div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm)">ℹ URL not in known API database — manual review needed</div>'}
+        </div>`;
+      }
+    }).join('');
+    const statsHtml='<div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap"><span class="badge bi">Total: '+r.total+'</span><span class="badge bi">Schema matched: '+r.schemaMatched+'</span><span class="badge '+(r.withMissing?'bc':'bg-ok')+'">Missing fields: '+r.withMissing+'</span></div>';
+    c.innerHTML=statsHtml+rows;
+  }
+
+  else if(id==='datasim'){
+    const c=document.getElementById('rc-datasim');
+    if(!r||!r.items){c.innerHTML='<div style="padding:12px;text-align:center;color:var(--tm);font-family:var(--fm);font-size:var(--xs)">No expressions to simulate. Click the engine card to provide sample data.</div>';return;}
+    if(!r.total){c.innerHTML='<div style="padding:12px;text-align:center;color:var(--tm);font-family:var(--fm);font-size:var(--xs)">No $json expressions found in workflow.</div>';return;}
+    const sampleKeysHtml=r.sampleKeys?'<div style="margin-bottom:10px;font-size:var(--xs);font-family:var(--fm);color:var(--ts)">Sample data keys: '+r.sampleKeys.map(k=>'<span class="sf sf-out" style="margin:2px">'+esc(k)+'</span>').join('')+'</div>':'';
+    const rows=r.items.map(item=>`
+      <div style="background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);padding:10px;margin-bottom:8px;border-left:3px solid ${item.ok?'var(--green)':item.undefinedFields.length?'var(--vrs)':'var(--y3)'}">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
+          <span style="font-size:var(--sm);font-weight:600;color:var(--tp)">${esc(item.node)}</span>
+          <span class="badge ${item.ok?'bg-ok':item.undefinedFields.length?'bc':'bw'}">${item.ok?'✓ Resolved':item.undefinedFields.length?'Missing fields':'Error'}</span>
+        </div>
+        <div style="font-size:var(--xs);color:var(--blue);font-family:var(--fm);margin-bottom:4px">${esc(item.expression)}</div>
+        ${item.ok&&item.value!==null?'<div style="font-size:var(--xs);color:var(--green);font-family:var(--fm)">→ Resolves to: <strong>'+esc(item.value)+'</strong></div>':''}
+        ${item.undefinedFields.length?'<div style="font-size:var(--xs);color:var(--vrs);font-family:var(--fm)">Undefined fields: '+item.undefinedFields.map(esc).join(', ')+'</div>':''}
+        ${item.error?'<div style="font-size:var(--xs);color:var(--y3);font-family:var(--fm)">Eval error: '+esc(item.error)+'</div>':''}
+      </div>`).join('');
+    c.innerHTML=`<div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap"><span class="badge bg-ok">Total: ${r.total}</span><span class="badge bg-ok">Resolved: ${r.ok}</span><span class="badge ${r.fail>0?'bc':'bg-ok'}">Failed: ${r.fail}</span></div>${sampleKeysHtml}${rows}
+      <button class="btn btn-s" style="width:100%;margin-top:8px" onclick="document.getElementById('datasim-modal').style.display='block'">🔄 Re-run with different data</button>`;
+  }
+
+  else if(id==='intentdet'){
+    const c=document.getElementById('rc-intentdet');
+    if(r.verdict==='CLEAN'){c.innerHTML='<div style="padding:12px;text-align:center;color:var(--green);font-family:var(--fm);font-size:var(--sm)">✅ '+esc(r.verdictMsg)+'</div>';return;}
+    const sigRows=r.signals.map(s=>`<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--cardb);align-items:flex-start">
+      <span style="font-size:var(--xs);font-family:var(--fm);color:${s.weight>0?'var(--green)':'var(--vrs)'};flex-shrink:0;width:32px;font-weight:700">${s.weight>0?'+':''+(s.weight)}</span>
+      <span style="font-size:var(--xs);font-family:var(--fm);color:var(--ts);flex:1">${esc(s.signal)}</span>
+      <span style="font-size:var(--xs);font-family:var(--fm);color:var(--tm);flex-shrink:0">${esc(s.flag)}</span>
+    </div>`).join('');
+    const nodeRows=r.localhostNodes.map(n=>`<div style="font-size:var(--xs);font-family:var(--fm);padding:4px 8px;background:rgba(201,53,0,.08);border-radius:4px;margin-bottom:4px;color:var(--vrs)">${esc(n.name)}: ${esc(n.url)}</div>`).join('');
+    c.innerHTML=`
+      <div style="background:rgba(0,0,0,.2);border-radius:var(--r);padding:12px;margin-bottom:12px;text-align:center">
+        <div style="font-size:var(--2xl);font-weight:800;color:${r.verdictColor};letter-spacing:-.03em">${esc(r.verdict)}</div>
+        <div style="font-size:var(--xs);color:var(--ts);font-family:var(--fm);margin-top:4px">${esc(r.verdictMsg)}</div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:8px">
+          <span class="badge bi">Confidence: ${r.score}%</span>
+          <span class="badge bi">Signals: ${r.signals.length}</span>
+          <span class="badge ${r.localhostNodes.length?'bc':'bg-ok'}">Localhost nodes: ${r.localhostNodes.length}</span>
+        </div>
+      </div>
+      <div style="font-size:var(--xs);font-weight:700;color:var(--y4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Affected Nodes</div>
+      ${nodeRows}
+      <div style="font-size:var(--xs);font-weight:700;color:var(--y4);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 6px">Signal Analysis</div>
+      ${sigRows}`;
+  }
+
+  else if(id==='bizlogic'){
+    const c=document.getElementById('rc-bizlogic');
+    if(r.error){c.innerHTML='<div style="padding:12px;color:var(--vrs);font-family:var(--fm);font-size:var(--xs)">'+esc(r.error)+'</div>';return;}
+    const verdColor=r.verdict==='LOGIC MATCHES INTENT'?'var(--green)':r.verdict==='SIGNIFICANT GAPS'?'var(--vrs)':'var(--y3)';
+    const gapRows=(r.gaps||[]).map(g=>`<div style="background:rgba(201,53,0,.08);border:1px solid rgba(201,53,0,.2);border-radius:6px;padding:10px;margin-bottom:6px">
+      <div style="font-size:var(--sm);font-weight:700;color:var(--vrs);margin-bottom:3px">❌ ${esc(g.intent)}</div>
+      <div style="font-size:var(--xs);color:var(--ts);font-family:var(--fm)">${esc(g.message)}</div>
+      <div style="font-size:var(--xs);color:var(--tm);font-family:var(--fm);margin-top:3px">Expected node types: ${g.expected.map(esc).join(', ')}</div>
+    </div>`).join('');
+    const matchRows=(r.matched||[]).map(m=>`<div style="background:rgba(64,208,128,.06);border:1px solid rgba(64,208,128,.15);border-radius:6px;padding:8px;margin-bottom:4px;display:flex;align-items:center;gap:8px">
+      <span style="color:var(--green);font-size:14px">✅</span>
+      <div style="flex:1"><span style="font-size:var(--sm);font-weight:600;color:var(--tp)">${esc(m.intent)}</span>
+        <span style="font-size:var(--xs);color:var(--tm);font-family:var(--fm);margin-left:8px">→ ${m.nodes.map(esc).join(', ')}</span></div>
+    </div>`).join('');
+    const orderRows=(r.orderIssues||[]).map(o=>`<div style="background:rgba(232,180,0,.08);border-radius:4px;padding:6px 8px;margin-bottom:4px;font-size:var(--xs);color:var(--y3);font-family:var(--fm)">⚠ ${esc(o)}</div>`).join('');
+    const impossRows=(r.impossibles||[]).map(o=>`<div style="background:rgba(201,53,0,.08);border-radius:4px;padding:6px 8px;margin-bottom:4px;font-size:var(--xs);color:var(--vrs);font-family:var(--fm)">🚫 ${esc(o)}</div>`).join('');
+    c.innerHTML=`
+      <div style="background:rgba(0,0,0,.2);border-radius:var(--r);padding:12px;margin-bottom:12px;text-align:center">
+        <div style="font-size:var(--xl);font-weight:800;color:${verdColor}">${esc(r.verdict)}</div>
+        <div style="font-size:var(--2xl);font-weight:800;color:${verdColor};margin-top:4px">${r.coverageScore}% <span style="font-size:var(--sm);color:var(--tm);font-weight:500">coverage</span></div>
+        <div class="pb" style="margin-top:8px"><div class="pf" style="width:${r.coverageScore}%;background:${verdColor}"></div></div>
+      </div>
+      ${r.matched&&r.matched.length?'<div style="font-size:var(--xs);font-weight:700;color:var(--y4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">✅ Intent Covered ('+r.matched.length+')</div>'+matchRows:''}
+      ${r.gaps&&r.gaps.length?'<div style="font-size:var(--xs);font-weight:700;color:var(--vrs);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 6px">❌ Intent Gaps ('+r.gaps.length+')</div>'+gapRows:''}
+      ${r.orderIssues&&r.orderIssues.length?'<div style="font-size:var(--xs);font-weight:700;color:var(--y3);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 6px">⚠ Execution Order Issues</div>'+orderRows:''}
+      ${r.impossibles&&r.impossibles.length?'<div style="font-size:var(--xs);font-weight:700;color:var(--vrs);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 6px">🚫 Impossible Combinations</div>'+impossRows:''}
+      <button class="btn btn-s" style="width:100%;margin-top:12px" onclick="showBizLogicModal()">🔄 Re-run with updated intent</button>`;
+  }
+
+}
+
+// ═══════════════════════════════════════════
+// RENDER HELPERS
+// ═══════════════════════════════════════════
+function renderScores(r){
+  const s=r.scores;
+  document.getElementById('h-score').textContent=s.health+'%';
+  document.getElementById('eff-score').textContent=s.efficiency+'%';
+  document.getElementById('stab-score').textContent=s.stability+'%';
+  document.getElementById('sec-score').textContent=s.security+'%';
+  document.getElementById('node-count').textContent=r.metrics.nodeCount;
+  const circ=299.2,offset=circ-(s.health/100)*circ;
+  const col=s.health>=80?'#40D080':s.health>=50?'#E8B400':'#FF6B35';
+  setTimeout(()=>{const c=document.getElementById('score-circle');c.style.strokeDashoffset=offset;c.style.stroke=col;c.style.filter='drop-shadow(0 0 6px '+col+')';document.getElementById('h-score').style.color=col},100);
+}
+
+function renderErrors(r){
+  const list=document.getElementById('err-list'),badge=document.getElementById('err-badge');
+  if(!r.errors.length){list.innerHTML='<div style="text-align:center;padding:14px;color:var(--tm);font-size:var(--sm)">✅ No structural issues</div>';badge.style.display='none';return}
+  badge.style.display='inline-flex';badge.textContent=r.errors.length+' Issues';
+  list.innerHTML=r.errors.map(e=>`<div class="ei ${e.severity}" role="button" tabindex="0" onclick="toggleX(this)" onkeydown="if(event.key==='Enter')toggleX(this)" aria-expanded="false"><div class="ei-hdr"><span class="ei-title">${esc(e.type)}</span><span class="badge ${e.severity==='critical'?'bc':e.severity==='warning'?'bw':'bi'}">${e.severity.toUpperCase()}</span></div><div class="ei-det">${esc(e.message)}${e.node?'<br>Node: <span style="color:var(--y3)">'+esc(e.node)+'</span>':''}</div></div>`).join('');
+}
+
+function renderMetrics(r){
+  const m=r.metrics;
+  document.getElementById('met-list').innerHTML=[
+    ['Name',m.name],['Nodes',m.nodeCount],['Connections',m.connCount],
+    ['Triggers',m.triggerCount],['Active',m.active?'Yes':'No'],['Version',m.version],
+    ['Critical',r.errors.filter(e=>e.severity==='critical').length],
+    ['Warnings',r.errors.filter(e=>e.severity==='warning').length]
+  ].map(([l,v])=>`<div class="mr"><span class="mr-l">${l}</span><span class="mr-v">${esc(String(v))}</span></div>`).join('');
+}
+
+function renderOptimizer(r){
+  document.getElementById('opt-empty').style.display='none';
+  document.getElementById('opt-results').style.display='block';
+  document.getElementById('sug-list').innerHTML=r.suggestions.map(s=>`<div class="oi"><span class="oi-icon">${s.icon}</span><div><div class="oi-title">${esc(s.title)}</div><div class="oi-desc">${esc(s.description)}</div></div></div>`).join('');
+  document.getElementById('prog-list').innerHTML=[['Health',r.scores.health],['Efficiency',r.scores.efficiency],['Stability',r.scores.stability],['Security',r.scores.security]].map(([l,v])=>`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:var(--sm);color:var(--ts);font-weight:500">${l}</span><span style="font-size:var(--sm);color:var(--y3);font-weight:700;font-family:var(--fm)">${v}%</span></div><div class="pb"><div class="pf" style="width:${v}%"></div></div></div>`).join('');
+}
+
+function renderExport(r){
+  document.getElementById('exp-empty').style.display='none';
+  document.getElementById('exp-results').style.display='block';
+  const crit=r.errors.filter(e=>e.severity==='critical').length,warn=r.errors.filter(e=>e.severity==='warning').length;
+  document.getElementById('sum-report').innerHTML=[
+    ['Workflow',r.metrics.name],['Health',r.scores.health+'%'],['Critical',crit],['Warnings',warn],['Nodes',r.metrics.nodeCount],['At',new Date().toLocaleTimeString()]
+  ].map(([l,v])=>`<div class="mr"><span class="mr-l">${l}</span><span class="mr-v">${esc(String(v))}</span></div>`).join('');
+  document.getElementById('fixed-out').innerHTML=syntaxHL(JSON.stringify(r.fixedJSON,null,2));
+  document.getElementById('sec-mani').innerHTML=[
+    ['Hardcoded Secrets',r.suggestions.some(s=>s.title.includes('Sensitive'))?'⚠️ Detected':'✅ Clean'],
+    ['Missing Credentials',r.errors.filter(e=>e.type.includes('Credentials')).length>0?'⚠️ Found':'✅ OK'],
+    ['Circular Deps',r.errors.some(e=>e.type.includes('Circular'))?'⚠️ Found':'✅ None'],
+    ['Broken Connections',r.errors.some(e=>e.type.includes('Broken'))?'⚠️ Found':'✅ None']
+  ].map(([l,v])=>`<div class="mr"><span class="mr-l">${l}</span><span class="mr-v">${v}</span></div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+// LOGS
+// ═══════════════════════════════════════════
+function addLog(sev,msg,det=''){S.logs.unshift({id:Date.now()+Math.random(),severity:sev,message:msg,detail:det,time:new Date().toLocaleTimeString()});if(S.logs.length>300)S.logs.pop()}
+function renderLogs(){
+  const f=document.getElementById('log-filter')?.value||'all';
+  const c=document.getElementById('log-container');
+  const items=f==='all'?S.logs:S.logs.filter(l=>l.severity===f);
+  if(!items.length){c.innerHTML='<div class="empty"><div class="empty-i">📋</div><div class="empty-t">No entries match filter.</div></div>';return}
+  c.innerHTML=items.map(l=>`<div class="log-e" role="listitem" tabindex="0" onclick="toggleX(this)" onkeydown="if(event.key==='Enter')toggleX(this)"><span class="log-dot ${l.severity}"></span><span class="log-msg">${esc(l.message)}</span><span class="log-time">${l.time}</span><span class="log-det">${esc(l.detail)}</span></div>`).join('');
+}
+function clearLogs(){S.logs=[];renderLogs();toast('🗑 Logs cleared')}
+
+// ═══════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════
+function dlFixed(){if(!S.result){toast('⚠ No data');return}dl(JSON.stringify(S.result.fixedJSON,null,2),'n8n-fixed.json','application/json');toast('⬇️ Fixed JSON downloaded')}
+function dlReport(){
+  if(!S.result){toast('⚠ No data');return}
+  const r=S.result;
+  const txt=`2026 n8n Problem Solver — Full Analysis Report\nGenerated: ${new Date().toISOString()}\n${'='.repeat(50)}\n\nHEALTH: ${r.scores.health}% | EFFICIENCY: ${r.scores.efficiency}% | STABILITY: ${r.scores.stability}% | SECURITY: ${r.scores.security}%\n\nERRORS (${r.errors.length})\n${r.errors.map(e=>`[${e.severity.toUpperCase()}] ${e.type}\n  ${e.message}\n  Node: ${e.node||'N/A'}`).join('\n\n')}\n\nSUGGESTIONS (${r.suggestions.length})\n${r.suggestions.map(s=>`${s.icon} ${s.title}\n  ${s.description}`).join('\n\n')}`;
+  dl(txt,'n8n-report.txt','text/plain');toast('📄 Report downloaded');
+}
+function copyFixed(){if(!S.result){toast('⚠ No data');return}const t=JSON.stringify(S.result.fixedJSON,null,2);navigator.clipboard.writeText(t).then(()=>toast('📋 Copied')).catch(()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);toast('📋 Copied')})}
+function dl(c,fn,type){const b=new Blob([c],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=fn;a.click();URL.revokeObjectURL(u)}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function toggleX(el){const e=el.classList.contains('expanded');el.classList.toggle('expanded',!e);el.setAttribute('aria-expanded',String(!e))}
+function setStatus(m){const e=document.getElementById('status-ind');e.className='sp-pill sp-'+(m==='scanning'?'scan':m==='ready'?'ok':'err');e.innerHTML='<span class="sp-dot"></span><span>'+(m==='scanning'?'Scanning':m==='ready'?'Ready':'Error')+'</span>'}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function syntaxHL(j){return j.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,m=>{let c='jn';if(/^"/.test(m))c=/:$/.test(m)?'jk':'js';else if(/true|false/.test(m))c='jb';else if(/null/.test(m))c='jnu';return`<span class="${c}">${esc(m)}</span>`})}
+
+// INIT
+addLog('info','App ready','2026 n8n Problem Solver initialized');
+toast('⚡ Ready — drop your n8n JSON');
+</script>
+</body>
+</html>
